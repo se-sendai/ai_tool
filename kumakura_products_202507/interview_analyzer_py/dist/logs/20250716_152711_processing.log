@@ -1,0 +1,307 @@
+2025-07-16 15:31:16,492 - INFO - [INTERVIEW] モードで処理を開始します...
+2025-07-16 15:31:16,494 - INFO - バックエンド処理を開始します。モード: interview
+2025-07-16 15:31:16,495 - INFO - Gemini APIが正常に設定されました。
+2025-07-16 15:31:16,518 - INFO - 日報集計期間が'monthly'に設定されました。
+2025-07-16 15:31:16,518 - INFO - --- API接続の独立テストを開始します ---
+2025-07-16 15:31:16,518 - INFO -     [Test] Geminiモデルを初期化しています...
+2025-07-16 15:31:16,518 - INFO -     [Test] Geminiモデルの初期化が完了しました。
+2025-07-16 15:31:16,518 - INFO -     [Test] 単純なプロンプトでコンテンツを生成しています...
+2025-07-16 15:31:17,414 - INFO -     [Test] APIからの応答を受信しました: 接続テスト、承知いたしました。応答できていますので、接続は問題ないようです。
+2025-07-16 15:31:17,414 - INFO - --- API接続の独立テストは成功しました ---
+2025-07-16 15:31:17,414 - INFO - モード: 面談分析を開始します。
+2025-07-16 15:31:17,415 - INFO - ディレクトリ 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート' 内のファイルを処理します。
+2025-07-16 15:31:17,415 - INFO - 合計 5 個のファイルが見つかりました。
+2025-07-16 15:31:17,415 - INFO - [1/5] ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' を処理中...
+2025-07-16 15:31:17,420 - INFO - ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' を正常に読み込みました。
+2025-07-16 15:31:17,420 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' のデータ構造をAIで分析中...
+2025-07-16 15:31:17,420 - INFO -   DEBUG: converting df_single.head() to csv string...
+2025-07-16 15:31:17,422 - INFO -   DEBUG: df_single.head() converted to csv string successfully.
+2025-07-16 15:31:17,422 - INFO -   DEBUG: Calling analyze_dataframe_structure_with_ai...
+2025-07-16 15:31:17,422 - INFO -     AIにデータ構造分析をリクエスト中...
+2025-07-16 15:31:17,422 - INFO -     AIへの入力データ（先頭部分）: 項目,記入内容
+従業員ID,001
+氏名,山田太郎
+面談日,2025-07-04
+現在の担当業務,Webアプリケーションのバックエンド開発（Python/Django）
+得意なプログラミング言語,"Python, JavaScript"
+... (省略)
+2025-07-16 15:31:17,422 - INFO -         DEBUG: AI prompt length: 1139 characters.
+2025-07-16 15:31:17,422 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:17,422 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:17,422 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:18,745 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:18,745 - INFO -         Gemini API応答受信
+2025-07-16 15:31:18,745 - INFO -     AIからのデータ構造分析応答を受信しました。
+2025-07-16 15:31:18,745 - INFO - AIからの生応答: ```json
+{"structure": "縦持ち", "item_col": "項目", "value_col": "記入内容", "employee_item": "従業員ID", "interview_date_item": "面談日", "comment_items": ["現在の担当業務"], "skills_item": "得意なプログラミング言語"}
+```
+2025-07-16 15:31:18,745 - INFO -     AI応答をJSONとしてパース中...
+2025-07-16 15:31:18,746 - INFO -     AI応答のパースが完了しました。
+2025-07-16 15:31:18,746 - INFO -   DEBUG: analyze_dataframe_structure_with_ai returned.
+2025-07-16 15:31:18,746 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' は縦持ち構造と判断されました。
+2025-07-16 15:31:18,747 - INFO -         DEBUG: Extracted skills: Python, JavaScript
+2025-07-16 15:31:18,749 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' の面談データをAIで要約中...
+2025-07-16 15:31:18,749 - INFO -     AIに面談データ全体の要約をリクエスト中...
+2025-07-16 15:31:18,749 - INFO -     AIへの入力テキスト（先頭部分）: 従業員ID: 001
+氏名: 山田太郎
+面談日: 2025-07-04
+現在の担当業務: Webアプリケーションのバックエンド開発（Python/Django）
+得意なプログラミング言語: Python, JavaScript
+最近学習した技術: Docker, Kubernetes
+技術的な課題と解決策: DBのパフォーマンスボトルネックを特定し、インデックス最適化とクエリチューニングで解決した。
+チームでの役割: 主にバックエンドの実装を担当。コードレビューにも積極的に参加。
+今後のキャリア目標: フルスタックエンジニアとして、設計からデプロイまで一貫して担当できるようになりたい。
+上長コメント: Pythonのスキルは非常に高く、問題解決能力も優れている。今後はフロントエンドの経験も積むと良い。
+... (省略)
+2025-07-16 15:31:18,749 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:18,749 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:18,749 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:20,627 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:20,627 - INFO -         Gemini API応答受信
+2025-07-16 15:31:20,627 - INFO -     AIからの面談コメント要約応答を受信しました。
+2025-07-16 15:31:20,627 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_001_面談シート.csv' のAIによるアドバイスを生成中...
+2025-07-16 15:31:20,627 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:20,628 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:20,628 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:21,904 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:21,905 - INFO -         Gemini API応答受信
+2025-07-16 15:31:21,905 - INFO - [2/5] ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' を処理中...
+2025-07-16 15:31:21,908 - INFO - ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' を正常に読み込みました。
+2025-07-16 15:31:21,908 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' のデータ構造をAIで分析中...
+2025-07-16 15:31:21,908 - INFO -   DEBUG: converting df_single.head() to csv string...
+2025-07-16 15:31:21,908 - INFO -   DEBUG: df_single.head() converted to csv string successfully.
+2025-07-16 15:31:21,908 - INFO -   DEBUG: Calling analyze_dataframe_structure_with_ai...
+2025-07-16 15:31:21,909 - INFO -     AIにデータ構造分析をリクエスト中...
+2025-07-16 15:31:21,909 - INFO -     AIへの入力データ（先頭部分）: 項目,記入内容
+従業員ID,002
+氏名,佐藤花子
+面談日,2025-07-04
+現在の担当業務,モバイルアプリ開発（iOS/Swift）
+得意なプログラミング言語,"Swift, Objective-C"
+... (省略)
+2025-07-16 15:31:21,909 - INFO -         DEBUG: AI prompt length: 1124 characters.
+2025-07-16 15:31:21,909 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:21,909 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:21,909 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:22,875 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:22,876 - INFO -         Gemini API応答受信
+2025-07-16 15:31:22,876 - INFO -     AIからのデータ構造分析応答を受信しました。
+2025-07-16 15:31:22,876 - INFO - AIからの生応答: ```json
+{"structure": "縦持ち", "item_col": "項目", "value_col": "記入内容", "employee_item": "氏名", "interview_date_item": "面談日", "comment_items": ["現在の担当業務"], "skills_item": "得意なプログラミング言語"}
+```
+2025-07-16 15:31:22,876 - INFO -     AI応答をJSONとしてパース中...
+2025-07-16 15:31:22,876 - INFO -     AI応答のパースが完了しました。
+2025-07-16 15:31:22,876 - INFO -   DEBUG: analyze_dataframe_structure_with_ai returned.
+2025-07-16 15:31:22,877 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' は縦持ち構造と判断されました。
+2025-07-16 15:31:22,877 - INFO -         DEBUG: Extracted skills: Swift, Objective-C
+2025-07-16 15:31:22,879 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' の面談データをAIで要約中...
+2025-07-16 15:31:22,879 - INFO -     AIに面談データ全体の要約をリクエスト中...
+2025-07-16 15:31:22,879 - INFO -     AIへの入力テキスト（先頭部分）: 従業員ID: 002
+氏名: 佐藤花子
+面談日: 2025-07-04
+現在の担当業務: モバイルアプリ開発（iOS/Swift）
+得意なプログラミング言語: Swift, Objective-C
+最近学習した技術: SwiftUI, Combine
+技術的な課題と解決策: UIの描画パフォーマンスが低下する問題を、非同期処理の最適化とレイアウトの改善で解決した。
+チームでの役割: iOSアプリの主要機能開発を担当。UI/UXデザインにも積極的に意見を出している。
+今後のキャリア目標: モバイルアプリ開発のスペシャリストとして、ユーザー体験を追求したアプリを開発したい。
+上長コメント: SwiftUIへの移行に意欲的で、新しい技術へのキャッチアップが早い。デザインセンスも良い。
+... (省略)
+2025-07-16 15:31:22,879 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:22,879 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:22,879 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:25,401 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:25,401 - INFO -         Gemini API応答受信
+2025-07-16 15:31:25,402 - INFO -     AIからの面談コメント要約応答を受信しました。
+2025-07-16 15:31:25,402 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_002_面談シート.csv' のAIによるアドバイスを生成中...
+2025-07-16 15:31:25,402 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:25,402 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:25,402 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:26,321 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:26,322 - INFO -         Gemini API応答受信
+2025-07-16 15:31:26,322 - INFO - [3/5] ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' を処理中...
+2025-07-16 15:31:26,323 - INFO - ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' を正常に読み込みました。
+2025-07-16 15:31:26,324 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' のデータ構造をAIで分析中...
+2025-07-16 15:31:26,324 - INFO -   DEBUG: converting df_single.head() to csv string...
+2025-07-16 15:31:26,324 - INFO -   DEBUG: df_single.head() converted to csv string successfully.
+2025-07-16 15:31:26,324 - INFO -   DEBUG: Calling analyze_dataframe_structure_with_ai...
+2025-07-16 15:31:26,324 - INFO -     AIにデータ構造分析をリクエスト中...
+2025-07-16 15:31:26,324 - INFO -     AIへの入力データ（先頭部分）: 項目,記入内容
+従業員ID,003
+氏名,鈴木一郎
+面談日,2025-07-04
+現在の担当業務,データ分析基盤の構築・運用（Python/SQL）
+得意なプログラミング言語,"Python, SQL"
+... (省略)
+2025-07-16 15:31:26,324 - INFO -         DEBUG: AI prompt length: 1122 characters.
+2025-07-16 15:31:26,324 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:26,324 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:26,324 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:27,550 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:27,550 - INFO -         Gemini API応答受信
+2025-07-16 15:31:27,550 - INFO -     AIからのデータ構造分析応答を受信しました。
+2025-07-16 15:31:27,550 - INFO - AIからの生応答: ```json
+{"structure": "縦持ち", "item_col": "項目", "value_col": "記入内容", "employee_item": "従業員ID", "interview_date_item": "面談日", "comment_items": ["現在の担当業務"], "skills_item": "得意なプログラミング言語"}
+```
+2025-07-16 15:31:27,550 - INFO -     AI応答をJSONとしてパース中...
+2025-07-16 15:31:27,550 - INFO -     AI応答のパースが完了しました。
+2025-07-16 15:31:27,550 - INFO -   DEBUG: analyze_dataframe_structure_with_ai returned.
+2025-07-16 15:31:27,550 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' は縦持ち構造と判断されました。
+2025-07-16 15:31:27,551 - INFO -         DEBUG: Extracted skills: Python, SQL
+2025-07-16 15:31:27,551 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' の面談データをAIで要約中...
+2025-07-16 15:31:27,551 - INFO -     AIに面談データ全体の要約をリクエスト中...
+2025-07-16 15:31:27,551 - INFO -     AIへの入力テキスト（先頭部分）: 従業員ID: 003
+氏名: 鈴木一郎
+面談日: 2025-07-04
+現在の担当業務: データ分析基盤の構築・運用（Python/SQL）
+得意なプログラミング言語: Python, SQL
+最近学習した技術: Apache Spark, Databricks
+技術的な課題と解決策: 大量データのETL処理が遅延する問題を、Sparkの分散処理とデータパーティショニングで改善した。
+チームでの役割: データエンジニアとして、データパイプラインの設計と実装を担当。
+今後のキャリア目標: データサイエンティストとして、ビジネス課題の解決に貢献したい。
+上長コメント: データ処理に関する深い知識を持つ。今後は分析結果をビジネスにどう活かすかという視点も養うと良い。
+... (省略)
+2025-07-16 15:31:27,551 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:27,551 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:27,551 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:29,459 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:29,459 - INFO -         Gemini API応答受信
+2025-07-16 15:31:29,459 - INFO -     AIからの面談コメント要約応答を受信しました。
+2025-07-16 15:31:29,459 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_003_面談シート.csv' のAIによるアドバイスを生成中...
+2025-07-16 15:31:29,460 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:29,460 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:29,460 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:30,608 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:30,608 - INFO -         Gemini API応答受信
+2025-07-16 15:31:30,609 - INFO - [4/5] ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' を処理中...
+2025-07-16 15:31:30,610 - INFO - ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' を正常に読み込みました。
+2025-07-16 15:31:30,610 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' のデータ構造をAIで分析中...
+2025-07-16 15:31:30,610 - INFO -   DEBUG: converting df_single.head() to csv string...
+2025-07-16 15:31:30,610 - INFO -   DEBUG: df_single.head() converted to csv string successfully.
+2025-07-16 15:31:30,610 - INFO -   DEBUG: Calling analyze_dataframe_structure_with_ai...
+2025-07-16 15:31:30,610 - INFO -     AIにデータ構造分析をリクエスト中...
+2025-07-16 15:31:30,610 - INFO -     AIへの入力データ（先頭部分）: 項目,記入内容
+従業員ID,004
+氏名,高橋恵子
+面談日,2025-07-04
+現在の担当業務,クラウドインフラ構築・運用（AWS/Terraform）
+得意なプログラミング言語,"Go, Python"
+... (省略)
+2025-07-16 15:31:30,610 - INFO -         DEBUG: AI prompt length: 1124 characters.
+2025-07-16 15:31:30,610 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:30,610 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:30,610 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:31,749 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:31,750 - INFO -         Gemini API応答受信
+2025-07-16 15:31:31,750 - INFO -     AIからのデータ構造分析応答を受信しました。
+2025-07-16 15:31:31,750 - INFO - AIからの生応答: ```json
+{"structure": "縦持ち", "item_col": "項目", "value_col": "記入内容", "employee_item": "従業員ID", "interview_date_item": "面談日", "comment_items": ["現在の担当業務"], "skills_item": "得意なプログラミング言語"}
+```
+2025-07-16 15:31:31,750 - INFO -     AI応答をJSONとしてパース中...
+2025-07-16 15:31:31,750 - INFO -     AI応答のパースが完了しました。
+2025-07-16 15:31:31,750 - INFO -   DEBUG: analyze_dataframe_structure_with_ai returned.
+2025-07-16 15:31:31,750 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' は縦持ち構造と判断されました。
+2025-07-16 15:31:31,751 - INFO -         DEBUG: Extracted skills: Go, Python
+2025-07-16 15:31:31,752 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' の面談データをAIで要約中...
+2025-07-16 15:31:31,752 - INFO -     AIに面談データ全体の要約をリクエスト中...
+2025-07-16 15:31:31,752 - INFO -     AIへの入力テキスト（先頭部分）: 従業員ID: 004
+氏名: 高橋恵子
+面談日: 2025-07-04
+現在の担当業務: クラウドインフラ構築・運用（AWS/Terraform）
+得意なプログラミング言語: Go, Python
+最近学習した技術: Kubernetes, Istio
+技術的な課題と解決策: マイクロサービス間の通信障害を、サービスメッシュの導入とログ監視の強化で解決した。
+チームでの役割: DevOpsエンジニアとして、CI/CDパイプラインの構築とインフラの自動化を担当。
+今後のキャリア目標: クラウドアーキテクトとして、大規模システムの設計・構築をリードしたい。
+上長コメント: AWSとTerraformの専門知識が豊富で、インフラの自動化に大きく貢献している。リーダーシップも期待できる。
+... (省略)
+2025-07-16 15:31:31,752 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:31,752 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:31,752 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:33,695 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:33,696 - INFO -         Gemini API応答受信
+2025-07-16 15:31:33,696 - INFO -     AIからの面談コメント要約応答を受信しました。
+2025-07-16 15:31:33,696 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_004_面談シート.csv' のAIによるアドバイスを生成中...
+2025-07-16 15:31:33,696 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:33,697 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:33,697 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:34,718 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:34,719 - INFO -         Gemini API応答受信
+2025-07-16 15:31:34,719 - INFO - [5/5] ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' を処理中...
+2025-07-16 15:31:34,722 - INFO - ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' を正常に読み込みました。
+2025-07-16 15:31:34,722 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' のデータ構造をAIで分析中...
+2025-07-16 15:31:34,722 - INFO -   DEBUG: converting df_single.head() to csv string...
+2025-07-16 15:31:34,723 - INFO -   DEBUG: df_single.head() converted to csv string successfully.
+2025-07-16 15:31:34,723 - INFO -   DEBUG: Calling analyze_dataframe_structure_with_ai...
+2025-07-16 15:31:34,723 - INFO -     AIにデータ構造分析をリクエスト中...
+2025-07-16 15:31:34,723 - INFO -     AIへの入力データ（先頭部分）: 項目,記入内容
+従業員ID,005
+氏名,田中次郎
+面談日,2025-07-04
+現在の担当業務,フロントエンド開発（React/TypeScript）
+得意なプログラミング言語,"JavaScript, TypeScript"
+... (省略)
+2025-07-16 15:31:34,723 - INFO -         DEBUG: AI prompt length: 1135 characters.
+2025-07-16 15:31:34,723 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:34,723 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:34,723 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:35,741 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:35,742 - INFO -         Gemini API応答受信
+2025-07-16 15:31:35,742 - INFO -     AIからのデータ構造分析応答を受信しました。
+2025-07-16 15:31:35,742 - INFO - AIからの生応答: ```json
+{"structure": "縦持ち", "item_col": "項目", "value_col": "記入内容", "employee_item": "氏名", "interview_date_item": "面談日", "comment_items": ["現在の担当業務"], "skills_item": "得意なプログラミング言語"}
+```
+2025-07-16 15:31:35,742 - INFO -     AI応答をJSONとしてパース中...
+2025-07-16 15:31:35,742 - INFO -     AI応答のパースが完了しました。
+2025-07-16 15:31:35,742 - INFO -   DEBUG: analyze_dataframe_structure_with_ai returned.
+2025-07-16 15:31:35,742 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' は縦持ち構造と判断されました。
+2025-07-16 15:31:35,743 - INFO -         DEBUG: Extracted skills: JavaScript, TypeScript
+2025-07-16 15:31:35,744 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' の面談データをAIで要約中...
+2025-07-16 15:31:35,744 - INFO -     AIに面談データ全体の要約をリクエスト中...
+2025-07-16 15:31:35,744 - INFO -     AIへの入力テキスト（先頭部分）: 従業員ID: 005
+氏名: 田中次郎
+面談日: 2025-07-04
+現在の担当業務: フロントエンド開発（React/TypeScript）
+得意なプログラミング言語: JavaScript, TypeScript
+最近学習した技術: Next.js, GraphQL
+技術的な課題と解決策: コンポーネントの再レンダリングによるパフォーマンス低下を、React.memoとuseCallbackの適用で改善した。
+チームでの役割: UIコンポーネントの開発と状態管理を担当。デザインシステムにも貢献。
+今後のキャリア目標: UI/UXに強いフロントエンドエンジニアとして、ユーザーに感動を与えるプロダクトを作りたい。
+上長コメント: ReactとTypeScriptの習熟度が非常に高い。デザインへの関心も強く、今後の成長が楽しみ。
+... (省略)
+2025-07-16 15:31:35,744 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:35,744 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:35,744 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:37,893 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:37,893 - INFO -         Gemini API応答受信
+2025-07-16 15:31:37,893 - INFO -     AIからの面談コメント要約応答を受信しました。
+2025-07-16 15:31:37,893 - INFO -   ファイル 'C:\Users\kumakura\Desktop\projects\programmer_interview_materials\20250704_面談シート\従業員ID_005_面談シート.csv' のAIによるアドバイスを生成中...
+2025-07-16 15:31:37,893 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:37,893 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:37,893 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:38,099 - ERROR - 予期せぬエラーが発生しました: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {
+  quota_metric: "generativelanguage.googleapis.com/generate_content_free_tier_requests"
+  quota_id: "GenerateRequestsPerMinutePerProjectPerModel-FreeTier"
+  quota_dimensions {
+    key: "model"
+    value: "gemini-2.0-flash"
+  }
+  quota_dimensions {
+    key: "location"
+    value: "global"
+  }
+  quota_value: 15
+}
+, links {
+  description: "Learn more about Gemini API quotas"
+  url: "https://ai.google.dev/gemini-api/docs/rate-limits"
+}
+, retry_delay {
+  seconds: 21
+}
+] (試行 1/3)。再試行します...
+2025-07-16 15:31:48,100 - INFO -         DEBUG: Attempting to initialize Gemini model (gemini-2.0-flash).
+2025-07-16 15:31:48,101 - INFO -         DEBUG: Gemini model initialized successfully.
+2025-07-16 15:31:48,101 - INFO -         DEBUG: Calling generate_content with timeout=60...
+2025-07-16 15:31:49,465 - INFO -         DEBUG: generate_content call finished.
+2025-07-16 15:31:49,466 - INFO -         Gemini API応答受信

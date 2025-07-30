@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analyzer - AIで面談を可視化する、次世代の分析ツール</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #FDFDFD; /* メインの背景色をより柔らかい白に */
+            --bg-alt: #F0F4F8;  /* 交互の背景色をわずかにグレーがかった色に */
+            --border-color: #D1D9E6; /* ボーダー色を少し濃く */
+            --text-primary: #2C3E50; /* テキスト色を少し濃く */
+            --text-secondary: #6C7A89; /* セカンダリテキスト色を調整 */
+            --accent-blue: #3498DB; /* アクセントブルーを調整 */
+            --accent-green: #2ECC71; /* アクセントグリーンを調整 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        header {
+            background-color: var(--bg-main);
+            backdrop-filter: blur(10px);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 24px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 64px auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 32px auto;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-blue);
+            color: #FFFFFF;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 32px;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980B9; /* 少し濃い青 */
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background-color: var(--bg-main);
+            padding: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .feature-card .icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 24px;
+            color: var(--accent-blue);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        /* Comparison Section */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 48px;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .comparison-table th {
+            background-color: var(--bg-main);
+            font-size: 1.2rem;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            background-color: var(--bg-main);
+        }
+        
+        .comparison-table .check {
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .comparison-table .cross {
+            color: #E53E3E;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-top: 80px;
+        }
+
+        section#problems {
+            background-color: var(--bg-main);
+        }
+
+        section#features {
+            background-color: var(--bg-alt);
+        }
+
+        section#comparison {
+            background-color: var(--bg-main);
+        }
+
+        section#faq {
+            background-color: var(--bg-alt);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Interview Analyzer</a>
+            <div class="nav-links">
+                <a href="#features">機能</a>
+                <a href="#comparison">他社比較</a>
+                <a href="#faq">FAQ</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>AIが面談の課題を解決。<br>データで導く人材育成。</h1>
+                <p>Interview Analyzerは、あなたのPCで安全に動作する革新的なAI面談分析ツールです。散在する面談記録や日報データから、AIが個人の潜在能力、成長の機会、そしてチーム全体の隠れたリスクを自動で抽出し、データに基づいた戦略的な人材育成と組織改善を強力にサポートします。</p>
+                <a href="#features" class="btn-primary">詳細を見る</a>
+            </div>
+        </section>
+
+        <section id="problems">
+            <div class="container">
+                <h2 class="section-title">こんな課題、ありませんか？</h2>
+                <p class="section-subtitle">1on1や面談は実施しているものの、その後のフォローアップや人材育成に活かしきれていないケースは少なくありません。</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>面談記録の形骸化</h3>
+                        <p>面談内容は記録しているが、多忙で読み返す時間がなく、結局「やりっぱなし」になっている。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>離職サインの見逃し</h3>
+                        <p>優秀な従業員のコンディション変化や、潜在的な不満に気づけず、突然の離職に繋がってしまう。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>感覚的な人材育成</h3>
+                        <p>データに基づいた客観的な育成計画が立てられず、マネージャーの経験や勘に頼りがちになっている。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Interview Analyzerの主な機能</h2>
+                <p class="section-subtitle">これらの課題を解決するため、シンプルかつ強力な機能を提供します。</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15a.75.75 0 01-.75-.75zM3.75 6a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15A.75.75 0 013.75 6zM3.75 18a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15a.75.75 0 01-.75-.75z" /></svg>
+                        </div>
+                        <h3>AIによる面談分析</h3>
+                        <p>CSVやExcel形式の面談記録をAIが瞬時に解析し、個々の従業員の強み、課題、潜在的な成長ポイントを自動で抽出します。これにより、マネージャーは面談の振り返り時間を大幅に削減し、より質の高いフィードバックと育成計画の策定に集中できます。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                        </div>
+                        <h3>日報分析と危険信号検知</h3>
+                        <p>日報データを週次・月次で自動集計・要約し、AIが従業員の体調、業務内容、心理状態の変化を詳細に分析します。これにより、エンゲージメントの低下、ストレスの兆候、離職リスクなどの「危険信号」を早期に察知し、手遅れになる前に適切なサポートを提供することが可能になります。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V8.25a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 8.25v10.5A2.25 2.25 0 006.75 21z" /></svg>
+                        </div>
+                        <h3>データベース統合とAI対話</h3>
+                        <p>全ての分析結果はセキュアなローカルデータベースに保存され、データはあなたのPCから外部に漏れることはありません。蓄積された豊富なデータを活用し、特定の従業員の長期的な成長履歴の追跡や、部署・チーム全体の傾向分析についてAIと自然言語で対話できます。これにより、データに基づいた戦略的な意思決定を支援します。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.001 0 003 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0h.008v.008H21V5.25zM9 17.25V12h6v5.25M12 12h.008v.008H12V12z" /></svg>
+                        </div>
+                        <h3>柔軟なAIバックエンド選択</h3>
+                        <p>Google Gemini APIと、ローカル環境で動作するオープンソースのOllamaを柔軟に選択・切り替え可能です。これにより、API利用料を最適化しつつ、Geminiの利用上限に達した場合でも、Ollamaを活用して継続的にAI分析を行うことができ、ビジネスの継続性を確保します。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <div class="container">
+                <h2 class="section-title">圧倒的なコストパフォーマンスとセキュリティ</h2>
+                <p class="section-subtitle">高価で複雑なSaaS型タレントマネジメントシステムとは一線を画す、開発者・小規模チーム向けのソリューションです。</p>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Interview Analyzer</th>
+                            <th>大手タレントマネジメントシステム</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>料金</td>
+                            <td class="check">買い切り型ライセンス</td>
+                            <td>高額 (月額数万〜数十万円)</td>
+                        </tr>
+                        <tr>
+                            <td>セキュリティ</td>
+                            <td class="check">ローカルPC内で完結</td>
+                            <td>クラウド上でデータを管理</td>
+                        </tr>
+                        <tr>
+                            <td>導入</td>
+                            <td class="check">ダウンロードしてすぐ利用可能</td>
+                            <td>複雑な設定・契約・研修が必要</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>機能</td>
+                            <td>面談・日報分析に特化</td>
+                            <td class="check">人事評価・労務管理など多機能</td>
+                        </tr>
+                        <tr>
+                            <td>データプライバシー</td>
+                            <td class="check">完全なローカル処理</td>
+                            <td>外部サーバーにデータ送信</td>
+                        </tr>
+                        <tr>
+                            <td>カスタマイズ性</td>
+                            <td class="check">オープンソースAI連携</td>
+                            <td>ベンダー依存</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="faq">
+            <div class="container">
+                <h2 class="section-title">よくある質問</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>どのように購入できますか？</h3>
+                        <p>本ツールは買い切り型の製品として提供されます。購入方法については、お問い合わせください。AIの利用にはGoogle Gemini APIキー等が必要ですが、無料利用枠の範囲内で動作するように設計されています。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>専門的な知識は必要ですか？</h3>
+                        <p>基本的なPC操作ができれば、GUIを通じて誰でも簡単にご利用いただけます。PythonやAIに関する専門知識は不要です。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>会社の機密情報(面談記録)を預けても安全ですか？</h3>
+                        <p>はい、安全です。本ツールはあなたのPC上で全ての処理が完結します（AI APIとの通信を除く）。面談データが外部のサーバーに保存されることは一切ありません。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>AIの利用について、どのような選択肢がありますか？</h3>
+                        <p>本ツールはGoogle Gemini APIとローカルで動作するOllamaの両方をサポートしています。config.iniファイルで簡単に切り替えることができ、Geminiの利用上限に達した場合でも、Ollamaを利用することで継続してAI分析を行うことが可能です。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>どのようなAIモデルが利用できますか？</h3>
+                        <p>Google Gemini API (Gemini 1.5 Flashなど) と、ローカルで動作するOllama (Llama 3, Mixtralなど) をサポートしています。config.iniファイルで簡単に切り替えることができ、用途やコストに応じて最適なAIモデルを選択できます。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>分析できるデータ量に制限はありますか？</h3>
+                        <p>基本的にはPCのメモリとストレージに依存します。AIモデルの処理能力にもよばれますが、一般的な面談記録や日報データであれば問題なく処理できます。大量のデータを扱う場合は、Ollamaのようなローカルモデルの利用が推奨されます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Interview Analyzer Project. All Rights Reserved.</p>
+            <p><a href="#" style="color: var(--text-secondary); text-decoration: none;">プライバシーポリシー</a> | <a href="#" style="color: var(--text-secondary); text-decoration: none;">お問い合わせ</a></p>
+        </div>
+    </footer>
+
+</body>
+</html>

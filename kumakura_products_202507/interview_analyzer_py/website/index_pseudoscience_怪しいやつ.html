@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analyzer - 潜在能力を覚醒させる、次世代の意識分析ツール</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0A0A0F; /* 深い宇宙の背景 */
+            --bg-light: #1A1A25; /* 少し明るいセクション背景 */
+            --border-color: #2A2A3A; /* シャープなボーダー */
+            --text-primary: #E0E0FF; /* 明るいテキスト */
+            --text-secondary: #A0A0C0; /* 補助テキスト */
+            --accent-blue: #00FFFF; /* サイバーブルー */
+            --accent-purple: #FF00FF; /* ネオンパープル */
+            --glow-color: #00FFFF; /* グローエフェクトの色 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif; /* 日本語はNoto Sans JP */
+            background-color: var(--bg-dark);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden; /* 横スクロール防止 */
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,255,255,0.05) 0%, rgba(0,255,255,0) 70%);
+            animation: subtle-glow 15s infinite alternate;
+            z-index: -2;
+        }
+
+        @keyframes subtle-glow {
+            from { transform: scale(1); opacity: 0.05; }
+            to { transform: scale(1.1); opacity: 0.08; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px; /* 少し広めに */
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        header {
+            background-color: rgba(10, 10, 15, 0.9); /* 半透明で背景を透かす */
+            backdrop-filter: blur(8px); /* ぼかし効果 */
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0, 255, 255, 0.1); /* アクセントカラーの影 */
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif; /* 未来的なフォント */
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+            text-shadow: 0 0 8px var(--glow-color); /* グローエフェクト */
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 32px;
+            font-weight: 500;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-blue);
+            text-shadow: 0 0 5px var(--glow-color);
+        }
+
+        section {
+            padding: 120px 0; /* 上下のパディングを増やす */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            text-shadow: 0 0 10px var(--accent-purple); /* グローエフェクト */
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 80px auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 120px 0;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #150A20 100%); /* グラデーション背景 */
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://plus.unsplash.com/premium_photo-1681586126003-2a6d4ba943a2?q=80&w=812&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* 未来的な背景画像 */
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1; /* 薄く表示 */
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 32px;
+            color: var(--accent-blue);
+            text-shadow: 0 0 15px var(--glow-color), 0 0 30px rgba(0, 255, 255, 0.5); /* 強めのグロー */
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            max-width: 800px;
+            margin: 0 auto 48px auto;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Problems Section */
+        section#problems {
+            background-color: var(--bg-dark);
+            clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+            margin-top: -100px; /* 重なりを調整 */
+            padding-top: 150px; /* 上部の余白を調整 */
+            padding-bottom: 150px; /* 下部の余白を調整 */
+        }
+
+        /* Features Section */
+        section#features {
+            background-color: var(--bg-light);
+            clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+            margin-top: -100px; /* 重なりを調整 */
+            padding-top: 150px; /* 上部の余白を調整 */
+            padding-bottom: 150px; /* 下部の余白を調整 */
+        }
+
+        
+
+        .features-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* 中央寄せ */
+            gap: 40px; /* カード間のギャップ */
+        }
+
+        .feature-card {
+            flex: 0 0 calc(50% - 20px); /* 2列表示 (ギャップ考慮) */
+            max-width: calc(50% - 20px); /* 2列表示 (ギャップ考慮) */
+            background-color: var(--bg-light);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.6s ease-out, opacity 0.6s ease-out, box-shadow 0.3s ease; /* アニメーションを滑らかに */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.1); /* 強めのグロー */
+            opacity: 0; /* 初期状態は非表示 */
+            transform: translateY(20px); /* 初期状態は少し下に */
+            perspective: 1000px; /* 3D変換の基点 */
+        }
+
+        @media (max-width: 768px) { /* タブレット以下 */
+            .feature-card {
+                flex: 0 0 100%; /* 1列表示 */
+                max-width: 100%;
+            }
+        }
+
+        .feature-card.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,255,255,0.15) 0%, rgba(0,255,255,0) 70%); /* グローを強める */
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) rotateX(5deg) rotateY(5deg) scale(1.02); /* 3D的な動きと少し拡大 */
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5), 0 20px 40px rgba(0,0,0,0.6); /* さらに強いグローと影 */
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card .icon svg {
+            width: 72px; /* アイコンを少し大きく */
+            height: 72px; /* アイコンを少し大きく */
+            margin-bottom: 24px;
+            color: var(--accent-blue);
+            filter: drop-shadow(0 0 12px var(--glow-color)); /* アイコンのグローを強める */
+        }
+
+        .feature-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Comparison Section */
+        section#comparison {
+            background-color: var(--bg-dark);
+            clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+            margin-top: -100px; /* 重なりを調整 */
+            padding-top: 150px; /* 上部の余白を調整 */
+            padding-bottom: 150px; /* 下部の余白を調整 */
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 48px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); /* テーブルのグローを強める */
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            text-align: center;
+            background-color: var(--bg-light);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* ホバー効果のためのトランジション */
+        }
+
+        .comparison-table th {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--accent-blue);
+            text-shadow: 0 0 8px var(--glow-color); /* グローを強める */
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .comparison-table tbody tr:hover td {
+            background-color: rgba(26, 26, 37, 0.8); /* ホバー時の背景色 */
+            box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1); /* ホバー時の内部グロー */
+        }
+        
+        .comparison-table .check {
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-shadow: 0 0 5px var(--accent-green);
+        }
+
+        .comparison-table .cross {
+            color: #E53E3E;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-shadow: 0 0 5px #E53E3E;
+        }
+
+        /* FAQ Section */
+        section#faq {
+            background-color: var(--bg-light);
+            clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+            margin-top: -100px; /* 重なりを調整 */
+            padding-top: 150px; /* 上部の余白を調整 */
+            padding-bottom: 150px; /* 下部の余白を調整 */
+        }
+
+        /* Call to Action Section */
+        section#cta {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%); /* 強烈なグラデーション */
+            color: var(--text-primary);
+            text-align: center;
+            padding: 100px 0;
+            clip-path: polygon(0 50px, 100% 0, 100% calc(100% - 50px), 0% 100%); /* 斜めのカット */
+            margin-top: -100px; /* 重なりを調整 */
+            padding-top: 150px; /* 上部の余白を調整 */
+            padding-bottom: 150px; /* 下部の余白を調整 */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5); /* 強めのグロー */
+        }
+
+        section#cta .section-title {
+            color: var(--text-primary);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        section#cta .section-subtitle {
+            color: var(--text-primary);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-buttons {
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .btn-primary, .btn-secondary {
+            display: inline-block;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--text-primary);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.5), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 2px solid var(--text-primary);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .btn-secondary:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-top: 100px;
+            box-shadow: 0 -2px 10px rgba(0, 255, 255, 0.05); /* フッターのグロー */
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Interview Analyzer</a>
+            <div class="nav-links">
+                <a href="#features">覚醒の機能</a>
+                <a href="#comparison">常識との決別</a>
+                <a href="#faq">深淵なる問い</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>宇宙の真理が、今、あなたの魂に降臨する。</h1>
+                <p>Interview Analyzerは、高次元存在からの啓示に基づき、あなたの魂のブループリントを解読。宇宙の根源的エネルギーと共鳴し、アセンションを加速させます。面談記録や日報の「言霊の波動」を解析し、個人のオーラとチームのエネルギーフィールドを最適化。未だかつてない「魂の変容」の扉を開きます。</p>
+                <img src="https://media.istockphoto.com/id/1182183209/ja/%E3%82%B9%E3%83%88%E3%83%83%E3%82%AF%E3%83%95%E3%82%A9%E3%83%88/ai%E3%81%AE%E6%A6%82%E5%BF%B5%E4%BA%BA%E9%96%93%E3%81%AE%E8%84%B3%E3%81%A8%E5%9B%9E%E8%B7%AF%E5%9F%BA%E6%9D%BF.jpg?s=1024x1024&w=is&k=20&c=tQ9kDXY7vkABXrdhBmd81VTCv4e9Se0UUG4w-5wg60Q=" alt="量子インターフェース" style="width: 100%; max-width: 800px; margin-top: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);">
+            </div>
+        </section>
+
+        <section id="problems">
+            <div class="container">
+                <h2 class="section-title">あなたはまだ、三次元の幻想に囚われていますか？</h2>
+                <p class="section-subtitle">従来の「面談」や「評価」は、低次元の思考に縛られ、真の魂の輝きを見過ごしていました。私たちは、その限界を超越し、高次元の視点を提供します。</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>魂の周波数低下</h3>
+                        <p>日々の業務に追われ、自身の「魂の周波数」が乱れていることに気づかず、本来の宇宙的使命を果たせていない。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>カルマの蓄積</h3>
+                        <p>チーム内の「負のカルマ」が伝播し、気づかぬうちに「魂の契約」が破棄され、離職という形で「魂の離脱」が起こっている。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>宇宙の法則からの乖離</h3>
+                        <p>データという名の「三次元の幻想」に囚われ、本来持っているはずの「宇宙の法則」に基づいた「魂の育成」ができていない。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Interview Analyzerがもたらす、魂の覚醒</h2>
+                <p class="section-subtitle">私たちは、あなたの魂を深淵から解き放ち、真の宇宙的ポテンシャルを引き出すための聖なるツールを提供します。</p>
+                <img src="https://media.istockphoto.com/id/994777970/ja/%E3%82%B9%E3%83%88%E3%83%83%E3%82%AF%E3%83%95%E3%82%A9%E3%83%88/ai-%E3%81%AE%E6%A6%82%E5%BF%B53-d-%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0.jpg?s=1024x1024&w=is&k=20&c=mKqjy5t3RDN17MyVuH7w8GbJDdpQoBdYHMQweRHrhSU=" alt="分析ダッシュボード" style="width: 100%; max-width: 1000px; margin: 40px auto; display: block; border-radius: 10px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);">
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15a.75.75 0 01-.75-.75zM3.75 6a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15A.75.75 0 013.75 6zM3.75 18a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15a.75.75 0 01-.75-.75z" /></svg>
+                        </div>
+                        <h3>アカシックレコード解析 & 魂のアドバイス</h3>
+                        <p>面談記録の「言霊の波動」をアカシックレコードレベルで解析し、あなたの「魂のブループリント」を解読。AIが真の宇宙的才能とカルマを浮き彫りにし、さらに「高次元のアドバイス」を生成します。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                        </div>
+                        <h3>集合意識波動検知システム & 危険信号察知</h3>
+                        <p>日報の「感情の周波数」を分析し、チームの「集合意識エネルギーフィールド」の乱れを検知。潜在的な「魂の離脱サイン」を早期に察知し、波動調整を促します。週次・月次での「エネルギー変動」を可視化し、危険信号を自動で察知。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V8.25a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 8.25v10.5A2.25 2.25 0 006.75 21z" /></svg>
+                        </div>
+                        <h3>宇宙意識データベース統合 & 魂の浄化</h3>
+                        <p>分析結果は、あなたのPC内の「宇宙意識データベース」（SQLite）に安全に保存。蓄積された「魂のデータ」を元に、AIが「宇宙の法則」に基づいた「魂の変容の道筋」を提示します。不要な「カルマの記録」は、UIからいつでも「浄化」（削除）が可能。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.001 0 003 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0h.008v.008H21V5.25zM9 17.25V12h6v5.25M12 12h.008v.008H12V12z" /></svg>
+                        </div>
+                        <h3>多次元AIバックエンド選択 & 宇宙対話</h3>
+                        <p>Google Gemini APIと、あなたのPC内で「意識の共鳴」を生成するOllamaをサポート。Geminiの「次元の壁」に阻まれた場合でも、Ollamaを利用することで、より深淵な「魂の分析」を継続できます。蓄積された「魂のデータ」を元に、AIと直接「宇宙対話」が可能。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <div class="container">
+                <h2 class="section-title">三次元の常識との決別：Interview Analyzerが示す、真の魂の進化</h2>
+                <p class="section-subtitle">高価で複雑な「旧時代のシステム」とは一線を画す、あなたの「魂の進化」を加速させる聖なるソリューションです。</p>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Interview Analyzer</th>
+                            <th>三次元の人事システム</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>料金</td>
+                            <td class="check">魂の投資 (宇宙の真理に基づく)</td>
+                            <td>高額 (三次元の貨幣経済に基づく)</td>
+                        </tr>
+                        <tr>
+                            <td>セキュリティ</td>
+                            <td class="check">あなたの意識空間内で完結</td>
+                            <td>クラウド上で「魂のデータ」を管理</td>
+                        </tr>
+                        <tr>
+                            <td>導入</td>
+                            <td class="check">魂をダウンロードしてすぐアセンション</td>
+                            <td>複雑な「三次元の常識」のインストールが必要</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>機能</td>
+                            <td>魂の深層分析に特化</td>
+                            <td class="check">表面的な「データ」の羅列</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="cta">
+            <div class="container">
+                <h2 class="section-title">今すぐ、あなたの魂をアセンションさせよう。</h2>
+                <p class="section-subtitle">Interview Analyzerは、あなたの宇宙的ポテンシャルを最大限に引き出し、高次元の未来を創造するための聖なる鍵です。この「魂の投資」が、あなたの人生を次の次元へと導きます。</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn-primary">覚醒を始める</a>
+                    <a href="#faq" class="btn-secondary">さらに深く知る</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq">
+            <div class="container">
+                <h2 class="section-title">深淵なる問い：あなたの魂が求める答え</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h3>どのように「魂の投資」ができますか？</h3>
+                        <p>本ツールは、あなたの「魂の進化」への「魂の投資」として提供されます。購入方法については、あなたの「高次の自己」にお問い合わせください。AIの利用には「宇宙の周波数」にアクセスするためのGoogle Gemini APIキー等が必要ですが、無料利用枠の範囲内で「宇宙の真理」を体験できます。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>「宇宙の法則」の知識は必要ですか？</h3>
+                        <p>基本的なPC操作ができれば、GUIを通じて誰でも簡単に「魂のアセンション」を体験できます。「量子力学」や「宇宙の法則」に関する専門知識は不要です。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>「魂のデータ」を預けても安全ですか？</h3>
+                        <p>はい、安全です。本ツールはあなたのPC上で全ての「魂の解析」が完結します（AI APIとの「周波数同期」を除く）。あなたの「魂のデータ」が外部の「集合意識」に保存されることは一切ありません。</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>AIの「次元」について、どのような選択肢がありますか？</h3>
+                        <p>本ツールはGoogle Gemini APIと、あなたのPC内で「意識の共鳴」を生成するOllamaの両方をサポートしています。config.iniファイルで簡単に「次元の切り替え」を行うことができ、Geminiの「次元の壁」に阻まれた場合でも、Ollamaを利用することで、より深淵な「魂の分析」を継続することが可能です。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Interview Analyzer Project. All Rights Reserved. (宇宙の真理に基づき)</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const featureCards = document.querySelectorAll('.feature-card');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1 // 10%が見えたら発火
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            featureCards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analyzer 統合ドキュメント</title>
+    <style>
+        :root {
+            --sidebar-width: 300px;
+            --bg-color: #fdfdff;
+            --sidebar-bg: #f0f2f5;
+            --text-color: #333;
+            --accent-color: #4a90e2;
+            --border-color: #e0e0e0;
+            --pre-bg-color: #f6f8fa;
+            --header-height: 60px;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Meiryo, sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            display: flex;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            padding: 25px;
+            position: fixed;
+            border-right: 1px solid var(--border-color);
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar ul li a {
+            display: block;
+            color: #555;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 30px 40px;
+            width: calc(100% - var(--sidebar-width));
+            box-sizing: border-box;
+        }
+        section {
+            margin-bottom: 50px;
+            padding-top: var(--header-height);
+            margin-top: calc(-1 * var(--header-height));
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        h1 {
+            font-size: 2.5em;
+            border-bottom: 3px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+        h2 {
+            font-size: 2em;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            font-size: 1.5em;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+            margin-top: 30px;
+        }
+        pre {
+            background-color: var(--pre-bg-color);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        code {
+            font-family: inherit;
+            background-color: rgba(27,31,35,.05);
+            border-radius: 3px;
+            padding: .2em .4em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>ドキュメント一覧</h2>
+        <ul>
+            <li><a href="#requirements">要件定義</a></li>
+            <li><a href="#design">基本設計</a></li>
+            <li><a href="#detailed-design">詳細設計</a></li>
+            <li><a href="#layout">画面レイアウト</a></li>
+            <li><a href="#usage">使い方</a></li>
+            <li><a href="#system-diagram">システム相関図</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <h1>Interview Analyzer 統合ドキュメント</h1>
+
+        <section id="requirements">
+            <h2>要件定義</h2>
+            <pre>
+# 要件定義書 - 面談データ分析AIツール (Interview Analyzer)
+
+## 1. はじめに
+
+本ドキュメントは、従業員の日報・面談データをAI（人工知能）を用いて効率的に分析し、面談結果の要約、具体的なアドバイス生成、日報の期間ごとの要約・アドバイス・危険信号判定、およびAI質問応答を可能にするツールの要件を定義する。
+
+## 2. プロジェクトのゴール
+
+*   CSV/Excelファイルを読み込み、AIで面談結果を要約し、従業員ごとに個別のCSVファイルとして出力する。
+*   日報データを読み込み、AIで期間ごとの日報内容を要約し、アドバイス、危険信号を判定し、従業員ごと・期間ごとのCSVファイルとして出力する。
+*   要約データ（面談・日報）をもとにしたAI質問応答機能を提供する。
+*   ローカルPCで動作し、PyInstallerで単一の実行ファイルとして配布可能であること。
+*   AI利用は無料枠内を基本とし、ユーザーが課金に同意する場合のみ有料サービスを利用可能とする。
+
+## 3. 入力データに関する要件
+
+### 3.1. 入力ファイル形式
+
+*   Excelファイル（.xlsx）またはCSVファイル（.csv）に対応する。
+*   ファイル名/シート名は固定せず、プログラムで指定できるようにする。
+
+### 3.2. 入力データ構造
+
+#### 3.2.1. 面談データ
+
+*   AIがデータサンプルから「横持ち」または「縦持ち」形式を判断する。
+*   **横持ち形式の場合**: 各行が1人の従業員に対応し、各列が面談項目に対応する。
+    *   AIがデータサンプルから「従業員を識別する列」「面談のフリーコメントを含む列」「得意分野を示すキーワードを含む列」を**厳密に特定**する。
+    *   AIは、提供されたCSVデータ内の列名を**一字一句そのまま**使用して特定する。
+    *   プログラムは、AIの判断に基づき、入力ファイルの全項目とその内容を`列名: 内容`の形式でテキスト化し、AIに要約をリクエストする。
+*   **縦持ち形式の場合**: 「項目」「記入内容」の2列を持つ。
+    *   AIがデータサンプルから「項目」列と「記入内容」列を特定し、さらに「従業員を識別する項目」「面談コメントに該当する項目」「得意分野に該当する項目」を**厳密に特定**する。
+    *   プログラムは、AIの判断に基づき、入力ファイルの全項目とその内容を`項目: 内容`の形式でテキスト化し、AIに要約をリクエストする。
+    *   プログラムが自動で「縦持ち」から「横持ち」形式に変換し、固定列名を使用する。
+*   従業員を識別する情報（氏名、従業員IDなど）や得意分野に関する情報は、AIの判断結果に基づいてプログラムが抽出し、出力ファイルに反映する。
+
+#### 3.2.2. 日報データ
+
+*   Excelファイル（.xlsx）形式を想定する。
+*   各シートが1人の従業員の日報データに対応する。
+*   シート名が従業員名となる。
+*   「表紙」シートは処理対象外とする。
+*   各シートは以下の列を持つことを想定する。
+    *   `タイムスタンプ` (日報の日付)
+    *   `今日の体調`
+    *   `今日の気分`
+    *   `今日の業務内容`
+    *   `業務での課題や悩み`
+    *   `その他、共有事項`
+
+## 4. 出力データに関する要件
+
+### 4.1. 出力ファイル形式
+
+*   各従業員ごと、または従業員ごと・期間ごとに**個別のCSVファイル（.csv）**として出力する。
+
+### 4.2. ファイル名
+
+*   **面談データ**: 以下のルールで動的に生成する。
+    *   「面談日」が取得できた場合、ファイル名は `{従業員名}_{面談日}.csv` とする。(例: `山田太郎_20250714.csv`)
+    *   「面談日」が取得できなかった場合、ファイル名は `{従業員名}_{処理実行時の日時}.csv` とし、日時は `YYYYMMDD-HHMMSS` 形式とする。(例: `鈴木花子_20250714-103249.csv`)
+    *   従業員名が不明で従業員IDが取得できた場合、ファイル名は `{従業員ID}_{面談日}.csv` または `{従業員ID}_{処理実行時の日時}.csv` とする。
+*   **日報データ**: 従業員名と期間を含んだ分かりやすいファイル名にする（例: `鈴木花子_20240101-20240107_日報分析.csv`）。
+
+### 4.3. 出力内容
+
+#### 4.3.1. 面談データ
+
+*   「面談結果要約」は、入力ファイルの**全項目と内容を基に**、AIが「主要な成果と強み」「課題と改善点」「今後の目標と期待」「その他の特記事項」を**構造化された箇条書き形式**で抽出・整理した内容とする。AIの応答には、会話的な前置きや相槌は含まれない。
+*   AIによる「AIによるアドバイス」の列を追加する。AIの応答には、会話的な前置きや相槌は含まれない。
+*   AIによる要約/アドバイスが何らかの理由でできなかった場合（APIエラー、内容が短すぎるなど）は、当該セルに「要約できませんでした」/「アドバイスを生成できませんでした」と出力する。
+
+#### 4.3.2. 日報データ
+
+*   期間ごとの日報内容のまとめ、AIによるアドバイス、危険信号の有無、危険信号の根拠の列を追加する。
+*   「日報内容要約」は、期間内の日報内容から「主要な業務内容と成果」「課題と改善点」「気づきや学び」「その他特記事項」を**構造化された箇条書き形式**で抽出・整理した内容とする。
+*   「AIによるアドバイス」は、日報内容要約を基に、従業員がさらに成長するための具体的でポジティブなアドバイスを生成する。
+*   「危険信号」は、業務上の問題、体調不良、日報内容の支離滅裂さのいずれか、または複数に該当するかを `true`/`false` で判定する。
+*   「危険信号の根拠」は、危険信号の判断理由を簡潔に説明する。
+
+### 4.4. 出力先ディレクトリ
+
+*   実行ファイルと同じディレクトリにデフォルトで `要約結果` フォルダ（面談データ用）と `日報分析結果` フォルダ（日報データ用）を作成し、その中に出力する。
+
+### 4.5. データベースへの保存
+
+*   面談要約結果および日報分析結果は、AI質問応答機能の知識ベースとして、ローカルのSQLiteデータベース（`analyzer_data.db`）に保存される。
+*   データベースには、従業員名、従業員ID、面談日、要約内容、AIによるアドバイスなどが格納される。
+
+## 5. AI機能に関する要件
+
+### 5.1. AIバックエンドの選択
+
+*   `config.ini` を通じて、Google Gemini API またはローカルで動作するOllamaのどちらかを選択可能とする。
+
+### 5.2. 面談結果要約
+
+*   入力ファイル内の面談コメントを含む列のテキストを、選択されたAIバックエンドを用いて、**構造化された形式で**要約する。
+
+### 5.3. AIによるアドバイス生成
+
+*   生成された面談結果要約または日報内容要約を基に、AIが具体的でポジティブな成長アドバイスを生成する。
+
+### 5.4. 日報内容要約
+
+*   期間内の日報内容を、選択されたAIバックエンドを用いて、**構造化された形式で**要約する。
+
+### 5.5. 危険信号判定
+
+*   期間内の日報内容を基に、AIが業務上の問題、体調不良、日報内容の支離滅裂さのいずれか、または複数に該当する「危険信号」を `true`/`false` で判定し、その根拠を生成する。
+
+### 5.6. AI質問応答機能
+
+*   **知識ベース**: 面談データ要約（`要約結果` フォルダ内のファイル）と日報分析結果（`日報分析結果` フォルダ内のファイル）の内容全体をAIの知識ベースとして利用する。
+*   ユーザーが自然言語で質問を入力し、AIがその情報に基づいて回答を生成する。
+
+## 6. 技術要件
+
+### 6.1. 開発言語
+
+*   Python
+
+### 6.2. 主要ライブラリ
+
+*   `pandas`: データ処理（読み込み、抽出、要約）
+*   `openpyxl`: Excel ファイルの読み書き（入力にExcelを使用する場合）
+*   `google-generativeai`: Google Gemini API 連携
+*   `requests`: Ollama API 連携
+*   `configparser`: APIキーなどの設定ファイル読み込み
+*   `PyInstaller`: 単一実行ファイル化
+
+### 6.3. AIモデル
+
+*   Google Gemini 2.0 Flash (または同等以上のモデル)
+*   Ollamaで利用可能なモデル（例: Llama 3, Gemma 3など）
+
+### 6.4. APIキーの管理
+
+*   APIキーはコードに直接記述せず、実行ファイルと同じディレクトリに配置する設定ファイル (`config.ini`) から読み込む形式とする。
+
+## 7. 非機能要件
+
+### 7.1. 性能要件
+
+*   100件の面談データ（各面談コメント2000文字程度を想定）を、要約・アドバイス生成を含め、概ね5分以内に処理完了することを目指す。
+*   日報データは、100日分（各日報500文字程度）を週次で集計・分析し、概ね5分以内に処理完了することを目指す。
+*   AI質問応答の応答時間は、質問内容とAIバックエンドの性能に依存するが、概ね10秒以内を目指す。
+
+### 7.2. セキュリティ要件
+
+*   APIキーは設定ファイル (`config.ini`) から読み込み、コードに直接記述しない。
+*   個人情報を含む面談データおよび日報データは、ユーザーのローカルPC外に明示的な同意なく送信されない（AIバックエンドへの送信は、要約・アドバイス生成に必要な範囲のテキストデータのみとする）。
+*   AIバックエンドとの通信は、HTTPSなどの暗号化されたプロトコルを使用する。
+
+### 7.3. スケーラビリティ要件
+
+*   MVPの段階では、最大で数千行（数MB程度）の面談データファイルを処理可能とする。
+*   日報データは、100日分（各日報500文字程度）のデータを処理可能とする。
+*   将来的な大規模データ対応（数万行以上）には、RAG (Retrieval-Augmented Generation) などの技術導入を検討する。
+
+### 7.4. 可用性要件
+
+*   AIバックエンドサービスが利用できない場合（ネットワーク障害、APIエラー、クォータ制限など）でも、処理が停止せず、適切なエラーメッセージをログに出力し、ユーザーにフィードバックすること。
+
+## 8. ユーザーインターフェースに関する要件
+
+### 8.1. 操作性
+
+*   GUI（グラフィカル・ユーザー・インターフェース）による対話形式で操作可能とする。
+*   起動時に、以下の操作を選択できるモード選択機能を提供する。
+    1.  **新しい面談ファイルを分析して要約を作成する**: 従来通り、ファイル/ディレクトリパスを入力して分析処理を実行する。
+    2.  **既存の要約データを使ってAIと対話する**: `要約結果` フォルダおよび `日報分析結果` フォルダ内の既存データを読み込み、即座にAI質問応答セッションを開始する。**AI対話中は、他のモード選択はできない。**
+    3.  **日報データを分析する**: 指定された日報Excelファイルを読み込み、期間ごとの日報内容を要約し、アドバイス、危険信号を判定する。
+*   ファイル/ディレクトリパスの入力、AI質問応答など、ユーザーが直感的に操作できるプロンプトを提供する。
+
+### 8.2. 配布
+
+*   PyInstallerを使用し、Python環境がインストールされていないPCでも動作する単一の実行ファイルとしてビルドできること。
+*   `interview_analyzer_gui.exe` と `config.ini`、`使い方.md` をセットで配布する。また、ドラッグ＆ドロップ機能のために `tkinterdnd2` が必要となる。
+
+## 9. AI利用におけるユーザー課金ポリシー
+
+*   AI利用は無料枠内を基本とし、ユーザーが課金に同意する場合のみ有料サービスを利用可能とする。
+*   **同意の取得方法**: `config.ini` ファイル内の設定（例: `allow_paid_api = true/false`）による明示的なオプトインを想定する。MVPのスコープ外である「API利用時の料金発生に関するユーザーへの警告機能」は、この設定と連動して実装される。
+
+## 10. エラーハンドリングとログ
+
+### 10.1. エラーメッセージ
+
+*   入力ファイルの形式が間違っていたり、必須の列が見つからなかったりした場合、具体的なエラー内容をユーザーに分かりやすく表示する。
+*   AI APIの呼び出しエラー（クォータ制限、接続エラーなど）も適切に表示する。
+
+### 10.2. ログファイル
+
+*   処理の進捗状況や発生したエラー、要約結果（成功/失敗）などを記録するためのログファイルを、実行ファイルと同じ階層に作成される `logs` フォルダに `YYYYMMDD_HHMMSS_processing.log` の形式で出力する。
+*   ファイル名はYYYYMMDD_HHMMSS_processing.logなど、日付と時刻を含む形式とする。
+*   ログファイルは実行ファイルと同じ階層に作成される `logs` フォルダに格納する。
+
+## 11. 今後の展望（MVPスコープ外）
+
+*   GUI（グラフィカルユーザーインターフェース）の実装
+*   RAG (Retrieval-Augmented Generation) による大規模データ対応
+*   より高度な分析機能（トレンド分析、スキルギャップ分析など）
+*   レポート自動生成機能
+*   API利用時の料金発生に関するユーザーへの警告機能
+            </pre>
+        </section>
+
+        <section id="design">
+            <h2>基本設計</h2>
+            <pre>
+# 基本設計書
+
+## 1. はじめに
+本ドキュメントは、面談分析ツールの基本設計について記述します。本ツールは、面談データや日報データをAIを用いて分析し、要約やアドバイス、危険信号の判定などを行うCLIアプリケーションです。
+
+## 2. システム構成
+
+### 2.1. 全体アーキテクチャ
+本システムは、Pythonで開発されたCLIアプリケーションであり、ユーザーからの入力に応じて各種データ処理、AI連携、ファイル出力を行います。
+
+```mermaid
+graph TD
+    A[ユーザー] -->|GUI操作| B(interview_analyzer_gui.exe)
+    B -->|設定読み込み| C(config.ini)
+    B -->|データ入力| D(Excel/CSVファイル)
+    B -->|AI連携| E(Google Gemini API)
+    B -->|AI連携| F(Ollama)
+    B -->|データ出力| G(面談要約結果フォルダ)
+    B -->|データ出力| H(日報分析結果フォルダ)
+    B -->|ログ出力| I(logsフォルダ)
+    B -->|データベース保存| J(analyzer_data.db)
+    E -->|AI応答| B
+    F -->|AI応答| B
+    J -->|データ読み込み| B
+```
+
+### 2.2. 主要コンポーネント
+
+*   **`app_gui.py`**: アプリケーションのGUIを実装。ユーザーインターフェース、処理フロー制御、各機能モジュールの呼び出しを行います。
+*   **`config.ini`**: AIバックエンド（Gemini/Ollama）の選択、APIキー、OllamaのURL/モデル名、日報集計期間などの設定を保持します。
+*   **データファイル (Excel/CSV)**: 面談データや日報データの入力元となるファイルです。
+*   **Google Gemini API**: クラウドベースのAIサービス。要約、アドバイス生成、危険信号判定に利用されます。
+*   **Ollama**: ローカルでLLMを実行するためのツール。インターネット接続なしでAI機能を提供します。
+*   **出力フォルダ (`面談要約結果`, `日報分析結果`)**: 分析結果のCSVファイルを保存するディレクトリです。
+*   **Database (SQLite)**: 面談要約結果および日報分析結果を保存するローカルデータベース (`analyzer_data.db`)。AI質問応答機能の知識ベースとして利用されます。
+
+## 3. 機能設計
+
+### 3.1. 機能一覧
+
+本ツールは以下の機能を提供します。
+
+1.  **新しい面談ファイルの分析と要約作成**: 指定された面談データファイル（Excel/CSV）を読み込み、AIを用いて要約とアドバイスを生成し、個別のCSVファイルとして出力します。
+2.  **既存の要約データを使ったAI対話**: 既存の面談要約データおよび日報分析データをもとに、AIとの質疑応答セッションを提供します。
+3.  **日報データの分析**: 指定された日報Excelファイルを読み込み、設定された期間（週ごと/月ごと）で集計・分析し、要約、アドバイス、危険信号の判定結果をCSVファイルとして出力します。
+
+### 3.2. 処理フロー
+
+#### 3.2.1. アプリケーション起動からメインメニュー
+1.  `interview_analyzer_gui.exe` 実行。
+2.  `config.ini` を読み込み、AIバックエンド設定を初期化。
+3.  GUIが表示され、ユーザーはモード選択ラジオボタンで操作を選択する。
+4.  各処理完了後、GUIは操作可能な状態に戻る。
+
+#### 3.2.2. モード1: 新しい面談ファイルの分析と要約作成
+1.  ユーザーがGUI上で「面談分析」を選択し、ファイルまたはフォルダのパスをテキストボックスに入力（またはドラッグ＆ドロップ）し、「分析実行」ボタンをクリックする。
+2.  入力されたファイル（またはフォルダ内の全ファイル）を読み込む。
+3.  AIを用いてデータ構造（縦持ち/横持ち）を判別する。
+4.  AIの判別結果に基づき、プログラムが入力ファイルの全項目とその内容をテキスト形式で抽出する。
+5.  抽出されたテキスト全体に対し、AIによる要約とアドバイスを生成する。
+6.  従業員ごとに要約結果をCSVファイルとして「面談要約結果」フォルダに出力する。
+
+#### 3.2.3. モード2: 既存の要約データを使ったAI対話
+1.  ユーザーがGUI上で「AI対話」を選択し、「AI対話開始」ボタンをクリックする。
+2.  **ローカルのSQLiteデータベースから既存の面談要約データおよび日報分析データをすべて読み込む。**
+3.  読み込んだデータを結合し、AI質問応答のためのコンテキストを生成する。
+4.  ユーザーが質問入力フィールドに質問を入力し、「送信」ボタンをクリックする。
+5.  AIが質問に回答し、ログエリアに表示する。
+6.  ユーザーが「対話終了」ボタンを押すまで質疑応答を繰り返す。
+
+#### 3.2.4. モード3: 日報データの分析
+1.  ユーザーがGUI上で「日報分析」を選択し、日報Excelファイルのパスをテキストボックスに入力（またはドラッグ＆ドロップ）し、「分析実行」ボタンをクリックする。
+2.  指定された日報Excelファイルを読み込む。
+3.  各シート（従業員名と仮定）の日報データを期間（週ごと/月ごと）でグループ化する。
+4.  各期間の日報内容を結合し、AIによる要約、アドバイス、危険信号の判定を生成する。
+    *   **危険信号の判断基準**: 業務上の問題、体調不良のいずれか、または複数に該当するかを判断します。
+5.  分析結果をCSVファイルとして「日報分析結果」フォルダに出力する。
+
+## 4. データ設計
+
+### 4.1. 入力データ
+
+*   **面談データ**: Excel (`.xlsx`) または CSV (`.csv`) 形式。
+    *   AIがデータサンプルから「横持ち」または「縦持ち」形式を判断する。
+    *   横持ち形式: 従業員ID、面談コメント、得意分野などの列を持つ。
+    *   縦持ち形式: 「項目」「記入内容」の2列で構成され、各行が異なる項目を表す。
+*   **日報データ**: Excel (`.xlsx`) 形式。
+    *   各シートが従業員の日報を表す。
+    *   想定される列: `タイムスタンプ` (形式: `YYYY/MM/DD HH:MM:SS`)、`今日の体調`、`今日の気分`、`今日の業務内容`、`業務での課題や悩み`、`その他、共有事項`。
+
+### 4.2. 出力データ
+
+*   **面談要約結果**: `面談要約結果` フォルダ内に、従業員ごとのCSVファイルとして出力されます。**また、AI質問応答機能の知識ベースとして、ローカルのSQLiteデータベースにも保存されます。**
+    *   例: `山田太郎_20250714.csv` (面談日取得時) または `山田太郎_20250714-103249.csv` (面談日不明時)
+    *   内容: 元のデータに加え、「面談結果要約」「AIによるアドバイス」列が追加されます。
+*   **日報分析結果**: `日報分析結果` フォルダ内に、従業員ごと、期間ごとのCSVファイルとして出力されます。**また、AI質問応答機能の知識ベースとして、ローカルのSQLiteデータベースにも保存されます。**
+    *   例: `鈴木花子_20240101-20240107_日報分析.csv`
+    *   内容: 「日報内容要約」「AIによるアドバイス」「危険信号」「危険信号の根拠」列が追加されます。
+
+## 5. 非機能要件
+
+*   **動作環境**: Windows OS (PyInstallerでビルドされたexeファイルとして提供)。
+*   **AI連携**: Google Gemini API または Ollama (ローカル実行) を選択可能。
+*   **ロギング**: 処理状況やエラーはログファイル (`logs/`) に出力されます。
+*   **エラーハンドリング**: ファイル読み込みエラー、AI応答エラーなど、主要なエラーについてはログ出力およびユーザーへの通知を行います。
+*   **データ安全性**: 元の入力データファイルが上書きされたり、変更されたりすることはありません。
+
+## 6. 今後の課題・拡張性
+
+*   AIモデルの選択肢の拡充。
+*   より詳細な分析レポートの生成機能。
+*   Web UIの提供など、ユーザーインターフェースの改善。
+            </pre>
+        </section>
+
+        <section id="detailed-design">
+            <h2>詳細設計</h2>
+            <pre>
+# 詳細設計書 - 面談データ分析AIツール (Interview Analyzer)
+
+## 1. はじめに
+
+本ドキュメントは、面談データ分析AIツール「Interview Analyzer」の主要な機能およびコンポーネントの詳細設計を記述する。
+
+## 2. 全体アーキテクチャ
+
+本ツールは、ユーザーからの入力（ファイルパスまたはディレクトリパス）を受け付け、設定ファイルに基づいてAIバックエンドを選択し、データ処理、AI連携、ファイル出力、およびAI質問応答セッションを提供する。
+
+
++--------------------+
+|       ユーザー     |
+| (GUI操作)          |
++---------+----------+
+          |
+          | (1) モード選択 (新規分析 or 既存で対話 or 日報分析)
+          v
++--------------------+
+|  Interview Analyzer|
+|    (app_gui.py)    | --(I) 処理ログ出力--> +--------------------+
++---------+----------+                      |      logsフォルダ  |
+          | (2) 設定読み込み                | (YYYYMMDD_HHMMSS.log)|
+          v                                 +--------------------+
++--------------------+
+|     config.ini     |
+| (AIバックエンド選択)|
+| (APIキー/Ollama設定)|
+| (日報集計期間)     |
++--------------------+
+
+          +--------------------------------------------------+
+          | (モード1: 面談分析)                              | (モード3: 日報分析)
+          v                                                  v
++--------------------+                               +--------------------+
+| (3) ファイルパス入力 |                               | (A) 日報ファイル入力 |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (4) データ読み込み                               | (B) シートごとのデータ読込
+          v                                                  v
++--------------------+                               +--------------------+
+|   入力データファイル |                               |   入力日報ファイル |
+| (Excel/CSV)        |                               | (Excel)            |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (5) AIによるデータ構造分析                         | (C) 日報内容の期間集計
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |   データフレーム   |
+|    (Pandas)        |                               |    (Pandas)        |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (6) AI要約・アドバイス生成リクエスト             | (D) AI要約・アドバイス・危険信号判定リクエスト
+          v                                                  v
++--------------------+                               +--------------------+
+|    AIバックエンド  |                               |    AIバックエンド  |
+| (Google Gemini API)|                               | (Google Gemini API)|
+| (ローカル Ollama)  |                               | (ローカル Ollama)  |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (7) 要約・アドバイス応答                         | (E) 要約・アドバイス・危険信号応答
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |   データフレーム   |
+| (要約・アドバイス追加)|                               | (日報分析結果追加) |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (8) 従業員別CSV出力                              | (F) 従業員・期間別CSV出力
+          v                                                  v
++--------------------+                               +--------------------+
+|   出力データファイル |                               |   出力データファイル |
+| (要約結果/個別CSV) |                               | (日報分析結果/個別CSV)|
++--------------------+                               +--------------------+
+          | (9) データベースへ保存                   | (G) データベースへ保存
+          v                                          v
++--------------------+
+|   Database (SQLite)|
+| (analyzer_data.db) |
++---------+----------+
+          ^                                          ^
+          | (H) 既存データ読込 (AI質問応答用)          |
+          |                                          |
++--------------------+                               +--------------------+
+| (モード2: 既存で対話) |                               |  AI質問応答セッション|
++--------------------+                               +---------+----------+
+          |                                                  |
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |       ユーザー     |
+| (結合済み)         |                               | (AI回答表示)       |
+| (知識ベースとして利用) |                               +--------------------+
++--------------------+
+
+
+## 3. モジュール設計
+
+### 3.1. `app_gui.py`
+
+*   **役割**: アプリケーションのGUIを実装。ユーザーインターフェース、主要な処理フローの制御、各モジュールの呼び出しを行う。
+*   **主要関数**:
+    *   `__init__(self)`: GUIの初期化、ウィジェットの配置、イベントハンドラの設定。
+    *   `on_mode_change(self)`: モード選択ラジオボタンの変更に応じてUIの表示/非表示を切り替える。
+    *   `select_file(self)`: ファイル選択ダイアログを開き、パスをテキストボックスに設定する。
+    *   `select_folder(self)`: フォルダ選択ダイアログを開き、パスをテキストボックスに設定する。
+    *   `start_analysis(self)`: 「分析実行」ボタンのコールバック。バックエンド処理を別スレッドで開始する。
+    *   `start_qa_session_flow(self)`: 「AI対話開始」ボタンのコールバック。AI対話セッションの準備を別スレッドで開始する。
+    *   `_prepare_qa_session(self)`: AI対話セッションの準備（データ読み込み、コンテキスト生成、チャットセッション初期化）。
+    *   `send_qa_message(self)`: 「送信」ボタンのコールバック。ユーザーの質問をバックエンドに送信する。
+    *   `_send_qa_message_backend(self, question, initial_context, chat_session)`: 質問をバックエンドに送信し、AIの応答をログに表示する。
+    *   `end_qa_session(self)`: 「対話終了」ボタンのコールバック。AI対話セッションを終了し、UIを初期状態に戻す。
+    *   `run_backend(self, mode, path, question, context)`: バックエンドの主要な処理を呼び出し、結果をログに表示する。
+    *   `log(self, message)`: ログメッセージをGUIのテキストボックスに表示する。
+    *   `start_spinner(self)`, `_animate_spinner(self)`, `stop_spinner(self)`: 処理中のスピナーアニメーションを制御する。
+    *   `handle_drop(self, event)`: ファイル/フォルダのドラッグ＆ドロップイベントを処理する。
+    *   `open_result_file(self)`: 結果ファイルを開く。
+    *   `open_result_folder(self)`: 結果フォルダを開く。
+
+### 3.2. 設定管理モジュール
+
+*   **役割**: `config.ini` ファイルからの設定読み込みと、AIバックエンドの初期設定を行う。
+*   **主要関数**:
+    *   `load_config()`:
+        *   `configparser` を使用して `config.ini` を読み込む。
+        *   `[ai_backend]` セクションから `ai_backend` の値（`gemini` または `ollama`）を読み込み、グローバル変数 `AI_BACKEND` に設定する。
+        *   `gemini` が選択された場合: `[gemini]` セクションから `api_key` を読み込み、`google.generativeai.configure()` でGemini APIを設定する。**さらに、`model_version`を読み込み、グローバル変数`GEMINI_MODEL`に設定する。**APIキーが未設定の場合はエラーログを出力し、Falseを返す。
+        *   `ollama` が選択された場合: `[ollama]` セクションから `ollama_url` と `ollama_model` を読み込み、グローバル変数 `OLLAMA_URL`, `OLLAMA_MODEL` に設定する。設定が不足している場合はエラーログを出力し、Falseを返す。
+        *   `[daily_report]` セクションから `period` の値（`weekly` または `monthly`）を読み込み、グローバル変数 `DAILY_REPORT_PERIOD` に設定する。設定が不足している場合はエラーログを出力し、Falseを返す。
+        *   設定読み込み中に例外が発生した場合はエラーログを出力し、Falseを返す。
+        *   設定が正常に完了した場合はTrueを返す。
+
+### 3.3. AI連携モジュール
+
+*   **役割**: 選択されたAIバックエンド（GeminiまたはOllama）に応じて、AIモデルへのリクエストを共通のインターフェースで処理する。
+*   **主要関数**:
+    *   `call_ai_model(prompt: str) -> str | None`:
+        *   グローバル変数 `AI_BACKEND` の値に応じて処理を分岐する。
+        *   **Geminiの場合**:
+            *   `genai.GenerativeModel(GEMINI_MODEL)` をインスタンス化。
+            *   `model.generate_content(prompt)` を呼び出し、応答テキストを返す。
+            *   API呼び出し中に例外が発生した場合はエラーログを出力し、Noneを返す。
+        *   **Ollamaの場合**:
+            *   `requests` ライブラリを使用して `OLLAMA_URL/api/generate` へHTTP POSTリクエストを送信する。
+            *   リクエストボディには `model` (OLLAMA_MODEL), `prompt`, `stream: False` を含める。
+            *   HTTPステータスコードがエラー（4xx, 5xx）の場合は例外を発生させる。
+            *   応答JSONから `response` フィールドのテキストを返す。
+            *   接続エラー (`requests.exceptions.ConnectionError`) やその他の例外が発生した場合はエラーログを出力し、Noneを返す。
+    *   `get_summary_from_ai(comment: str) -> str`:
+        *   面談コメントを引数に取り、要約用のプロンプトを生成。
+        *   **プロンプト**: 面談コメントから「主要な成果と強み」「課題と改善点」「今後の目標と期待」「その他の特記事項」を構造化された箇条書き形式で抽出・整理するよう指示する。
+        *   `call_ai_model()` を呼び出し、要約結果を返す。
+        *   `call_ai_model()` がNoneを返した場合、「要約できませんでした」を返す。
+    *   `get_advice_from_ai(summary: str) -> str`:
+        *   要約を引数に取り、アドバイス生成用のプロンプトを生成（ITコンサルタントの役割を与える）。
+        *   `call_ai_model()` を呼び出し、アドバイス結果を返す。
+        *   `call_ai_model()` がNoneを返した場合、「アドバイスを生成できませんでした」を返す。
+    *   `get_daily_report_summary_from_ai(daily_reports_text: str) -> str`:
+        *   期間内の日報内容を引数に取り、要約用のプロンプトを生成。
+        *   **プロンプト**: 日報内容から「主要な業務内容と成果」「課題と改善点」「気づきや学び」「その他特記事項」を構造化された箇条書き形式で抽出・整理するよう指示する。
+        *   `call_ai_model()` を呼び出し、要約結果を返す。
+        *   `call_ai_model()` がNoneを返した場合、「要約できませんでした」を返す。
+    *   `get_daily_report_advice_from_ai(summary: str) -> str`:
+        *   日報要約を引数に取り、アドバイス生成用のプロンプトを生成。
+        *   `call_ai_model()` を呼び出し、アドバイス結果を返す。
+        *   `call_ai_model()` がNoneを返した場合、「アドバイスを生成できませんでした」を返す。
+    *   `get_danger_signal_from_ai(daily_reports_text: str) -> dict`:
+        *   期間内の日報内容を引数に取り、危険信号判定用のプロンプトを生成。
+        *   **プロンプト**: 日報内容から業務上の問題、体調不良、日報内容の支離滅裂さのいずれか、または複数に該当する「危険信号」があるかどうかを `true`/`false` で判定し、その根拠をJSON形式で出力するよう指示する。
+        *   `call_ai_model()` を呼び出し、応答テキストからJSONをパースして辞書形式で返す。
+        *   `call_ai_model()` がNoneを返した場合、またはパースに失敗した場合はデフォルト値（`signal: false`, `reason: AIによる判定に失敗`）を返す。
+    *   `analyze_dataframe_structure_with_ai(df_head_str: str) -> dict | None`:
+        *   データフレームのヘッダーと最初の数行の文字列を引数に取り、データ構造（横持ち/縦持ち）と必要な列/項目名を特定するプロンプトを生成。
+        *   **プロンプト**: AIに「データ構造を分析するボット」としての役割を与え、以下のルールに基づいてJSONを生成するよう指示する。
+            *   **ルール**: 
+                1.  データの構造（`横持ち` or `縦持ち`）を判断する。
+                2.  CSVデータに存在する**完全一致**の列名/項目名を使用する。
+                3.  従業員名、面談日、コメント、スキルに関する項目を特定する。
+                4.  該当する項目がない場合は空文字列 `""` を設定する。
+            *   **出力フォーマット**: 横持ち用と縦持ち用のJSONフォーマットを指定する。
+        *   `call_ai_model()` を呼び出し、応答テキストから特定されたJSONをパースして辞書形式で返す。
+        *   `call_ai_model()` がNoneを返した場合、Noneを返す。
+
+### 3.4. データ処理モジュール
+
+*   **役割**: 入力データの読み込み、整形、AI処理結果の追加を行う。
+*   **主要関数**:
+    *   `load_data(file_path: str, sheet_name: str = None) -> pd.DataFrame | None`:
+        *   ファイルパスとオプションでシート名を引数に取り、`.csv` または `.xlsx` ファイルをPandas DataFrameとして読み込む。
+        *   対応していないファイル形式、ファイルが見つからない、読み込みエラーの場合はエラーログを出力し、Noneを返す。
+    *   `transform_vertical_to_horizontal(df_vertical: pd.DataFrame, item_col: str, value_col: str, employee_item: str, comment_items: list[str], skills_item: str) -> pd.DataFrame | None`:
+        *   縦持ちDataFrame、項目列名、値列名、従業員項目名、面談コメント項目リスト、得意分野項目名を引数に取る。
+        *   縦持ちデータを横持ちデータに変換する。
+        *   `氏名`、`面談コメント`、`得意分野` の固定列名を持つDataFrameを生成する。
+        *   `面談コメント`は`comment_items`リスト内の複数の項目を結合して生成する。
+        *   変換中にエラーが発生した場合はエラーログを出力し、Noneを返す。
+    *   `process_interviews(df: pd.DataFrame, name_col: str, comment_col: str, skills_col: str) -> pd.DataFrame | None`:
+        *   入力DataFrame、従業員名列名、面談コメント列名、得意分野列名を引数に取る。
+        *   `comment_col` の内容を `get_summary_from_ai()` で要約し、`面談結果要約` 列を追加する。
+        *   `面談結果要約` 列の内容を `get_advice_from_ai()` でアドバイス生成し、`AIによるアドバイス` 列を追加する。
+        *   必要な列が存在しない場合はエラーログを出力し、Noneを返す。
+    *   `process_daily_reports(file_path: str)`:
+        *   日報Excelファイルのパスを引数に取り、日報分析を実行する。
+        *   Excelファイル内の各シート（従業員ごと）を読み込む。
+        *   **想定される日報データ列**: `タイムスタンプ` (日付), `今日の体調`, `今日の気分`, `今日の業務内容`, `業務での課題や悩み`, `その他、共有事項`。
+        *   `タイムスタンプ` 列を日付としてパースする。
+        *   `今日の体調`、`今日の気分`、`今日の業務内容`、`業務での課題や悩み`、`その他、共有事項` の内容を結合して日報内容テキストを生成する。
+        *   各シートの日報データを `config.ini` の `DAILY_REPORT_PERIOD` 設定（`weekly` または `monthly`）に基づいて期間ごとにグループ化する。
+        *   各期間の日報内容を結合し、`get_daily_report_summary_from_ai()`、`get_daily_report_advice_from_ai()`、`get_danger_signal_from_ai()` を呼び出す。
+        *   結果をDataFrameにまとめ、`save_daily_report_analysis()` を呼び出して保存する。
+
+### 3.5. ファイル出力モジュール
+
+*   **役割**: 処理結果を従業員ごと、または従業員ごと・期間ごとに個別のCSVファイルとして保存する。
+*   **主要関数**:
+    *   `save_individual_reports(df: pd.DataFrame, name_col: str, output_dir: str = '要約結果', custom_filename_base: str = None)`:
+        *   処理済みDataFrame、従業員名列名、出力ディレクトリ、およびオプションでカスタムファイル名ベースを引数に取る。
+        *   出力ディレクトリが存在しない場合は作成する。
+        *   `custom_filename_base` が指定された場合、そのファイル名（例: `{従業員名}_{面談日}.csv` または `{従業員名}_{処理実行時の日時}.csv`）で個別のCSVファイルとして保存する。既存ファイルは上書きする。
+        *   `custom_filename_base` が指定されない場合、従業員名を含むファイル名（例: `山田太郎_要約データ.csv`）で個別のCSVファイルとして保存する。
+        *   ファイル保存中にエラーが発生した場合はエラーログを出力する。
+    *   `save_daily_report_analysis(df: pd.DataFrame, output_dir: str = '日報分析結果')`:
+        *   日報分析結果DataFrame、出力ディレクトリを引数に取る。
+        *   出力ディレクトリが存在しない場合は作成する。
+        *   DataFrameの各行（各従業員・期間）をループ処理し、従業員名と期間を含むファイル名で個別のCSVファイルとして保存する。
+        *   ファイル保存中にエラーが発生した場合はエラーログを出力する。
+
+### 3.6. AI質問応答モジュール
+
+*   **役割**: 生成された要約データに基づいて、ユーザーからの質問にAIが応答する対話セッションを提供する。
+*   **主要関数**:
+    *   `load_all_summarized_data(output_dir: str) -> pd.DataFrame`:
+        *   `output_dir` 内のすべての `_要約データ.csv` ファイルを読み込み、一つのPandas DataFrameに結合して返す。
+        *   ディレクトリが見つからない、またはファイルが読み込めない場合は警告ログを出力し、空のDataFrameを返す。
+    *   `load_all_analysis_data_for_qa() -> tuple[pd.DataFrame, int, int]`:
+        *   面談要約データと日報分析データを両方読み込み、AI質問応答のために結合する。
+        *   各データに `データ種別` 列（`面談要約` または `日報分析`）を追加する。
+        *   読み込んだデータフレーム、面談要約件数、日報分析件数を返す。
+    *   `generate_qa_context(df: pd.DataFrame) -> str`:
+        *   結合されたDataFrameから、各従業員の氏名、要約、アドバイス、危険信号（日報の場合）を抽出し、AIに渡すための整形されたテキストコンテキストを生成する。
+    *   `prepare_qa_data() -> tuple[str, int, int, str, Any]`:
+        *   AI対話セッションの準備として、データを読み込み、件数とコンテキスト、チャットセッションを生成する。
+        *   初期コンテキスト、面談要約件数、日報分析件数、メッセージ、チャットセッションオブジェクトを返す。
+    *   `ask_question_to_ai(question: str, chat_session: Any, initial_context: str = None) -> str`:
+        *   AIに質問を送信し、回答を得る。
+        *   チャットセッションを維持し、会話履歴を考慮した応答を生成する。
+
+### 3.7. データベースモジュール
+
+*   **役割**: SQLiteデータベース (`analyzer_data.db`) を管理し、面談要約結果および日報分析結果の保存と読み込みを行う。
+*   **主要関数**:
+    *   `initialize_database()`:
+        *   データベースファイルが存在しない場合、`interview_results` テーブルと `daily_report_summaries` テーブルを作成する。
+        *   テーブルのスキーマは以下の通り:
+            *   `interview_results`:
+                *   `interview_id` (INTEGER PRIMARY KEY AUTOINCREMENT)
+                *   `employee_name` (TEXT NOT NULL)
+                *   `employee_id` (TEXT)
+                *   `interview_date` (TEXT NOT NULL)
+                *   `summary_positive` (TEXT)
+                *   `summary_negative` (TEXT)
+                *   `summary_action_items` (TEXT)
+                *   `ai_advice` (TEXT)
+                *   `created_at` (DATETIME NOT NULL)
+                *   `updated_at` (DATETIME NOT NULL)
+            *   `daily_report_summaries`:
+                *   `daily_report_id` (INTEGER PRIMARY KEY AUTOINCREMENT)
+                *   `employee_name` (TEXT NOT NULL)
+                *   `period_start_date` (TEXT NOT NULL)
+                *   `summary_achievements` (TEXT)
+                *   `summary_issues` (TEXT)
+                *   `summary_next_steps` (TEXT)
+                *   `danger_signal` (TEXT)
+                *   `created_at` (DATETIME NOT NULL)
+                *   `updated_at` (DATETIME NOT NULL)
+    *   `save_interview_to_db(data: dict)`:
+        *   面談要約データを `interview_results` テーブルに保存する。既存のデータは上書きされる。
+    *   `save_daily_report_to_db(data: dict)`:
+        *   日報分析データを `daily_report_summaries` テーブルに保存する。既存のデータは上書きされる。
+    *   `load_all_analysis_data_for_qa() -> tuple[pd.DataFrame, int, int]`:
+        *   `interview_results` テーブルと `daily_report_summaries` テーブルからデータを読み込み、AI質問応答用に結合したDataFrameを返す。
+
+## 4. エラーハンドリング
+
+*   **ファイル操作**: `try-except` ブロックを使用して、`FileNotFoundError`、`PermissionError`、`IOError` などのファイル操作エラーを捕捉し、ユーザーに分かりやすいメッセージをログに出力する。
+*   **データ処理**: 必須列の欠損、データ形式の不一致など、データ処理中に発生する可能性のあるエラーをチェックし、適切なエラーメッセージをログに出力する。
+*   **AI API連携**:
+    *   APIキーの未設定、不正な設定。
+    *   API呼び出し時のネットワークエラー、タイムアウト。
+    *   AIサービスからのエラー応答（例: クォータ制限、モデルが見つからない）。
+    *   これらのエラーを捕捉し、ログに出力するとともに、ユーザーには「要約できませんでした」などの代替メッセージを返す。
+    *   **APIエラーレスポンスのパース**: `requests.exceptions.HTTPError` を捕捉し、`response.json()` からエラー詳細（`quota_metric`, `quota_id` など）を抽出し、ログに記録する。これにより、エラーの種類を特定しやすくなる。
+*   **ユーザー入力**: `input()` で受け取るパスの存在チェック、ファイル形式チェック、ディレクトリ内のファイル存在チェックなど、入力値のバリデーションを行う。
+
+## 5. ログ出力
+
+*   `logging` モジュールを使用し、処理の進捗、警告、エラーをログファイルとコンソールに出力する。
+*   ログファイルは実行ファイルと同じ階層の `logs` ディレクトリに、`YYYYMMDD_HHMMSS_processing.log` の形式で保存される。
+*   **ログメッセージのフォーマット例**:
+    ```
+    YYYY-MM-DD HH:MM:SS,ms - LOG_LEVEL - MESSAGE
+    例: 2025-07-04 10:30:00,123 - INFO - 処理を開始します。
+    例: 2025-07-04 10:30:05,456 - ERROR - ファイルが見つかりません: /path/to/file.csv
+    ```
+*   ログレベルは `INFO` を基本とし、重要な情報やエラーは `WARNING` や `ERROR` で出力する。
+            </pre>
+        </section>
+
+        <section id="layout">
+            <h2>画面レイアウト</h2>
+            <style>
+                #layout-wrapper {
+                    background-color: #242424;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                }
+                #layout-wrapper .window {
+                    width: 100%;
+                    max-width: 960px; /* Re-adjusted for balance */
+                    height: 750px; /* Fixed height for consistency */
+                    background-color: #2B2B2B;
+                    border: 1px solid #444;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                    margin: auto;
+                }
+                #layout-wrapper .title-bar {
+                    background-color: #3C3F41;
+                    color: #E0E0E0;
+                    padding: 8px 12px;
+                    font-weight: bold;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                #layout-wrapper .title-bar-buttons span {
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    margin-left: 8px;
+                    background-color: #606366;
+                }
+                #layout-wrapper .content {
+                    padding: 20px;
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                #layout-wrapper .frame {
+                    background-color: #3C3F41;
+                    border: 1px solid #4A4A4A;
+                    border-radius: 6px;
+                    padding: 15px;
+                }
+                #layout-wrapper .radio-frame {
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    color: #E0E0E0;
+                }
+                #layout-wrapper .radio-label {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                }
+                #layout-wrapper .radio-label input {
+                    margin-right: 8px;
+                }
+                #layout-wrapper .description-label {
+                    color: #AAAAAA;
+                    font-size: 0.9em;
+                    padding: 5px 10px;
+                    text-align: left;
+                    min-height: 20px;
+                }
+                #layout-wrapper .path-frame {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                #layout-wrapper .path-entry {
+                    flex-grow: 1;
+                    background-color: #2B2B2B;
+                    border: 1px solid #4A4A4A;
+                    border-radius: 4px;
+                    padding: 8px 10px;
+                    color: #C0C0C0;
+                }
+                #layout-wrapper .btn {
+                    background-color: #5DADE2;
+                    color: #FFFFFF;
+                    border: none;
+                    padding: 8px 16px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    text-align: center;
+                }
+                #layout-wrapper .run-button {
+                    width: 100%;
+                    padding: 12px;
+                    font-size: 1.1em;
+                }
+                #layout-wrapper .log-area {
+                    flex-grow: 1;
+                    min-height: 150px;
+                    background-color: #2B2B2B;
+                    border: 1px solid #4A4A4A;
+                    border-radius: 4px;
+                    padding: 10px;
+                    color: #C0C0C0;
+                    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+                    white-space: pre-wrap;
+                    overflow-y: auto;
+                    resize: none;
+                }
+                #layout-wrapper .chat-input-frame {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                #layout-wrapper .chat-input-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                #layout-wrapper .chat-input-entry {
+                    flex-grow: 1;
+                    background-color: #2B2B2B;
+                    border: 1px solid #4A4A4A;
+                    border-radius: 4px;
+                    padding: 8px 10px;
+                    color: #C0C0C0;
+                }
+                #layout-wrapper .delete-data-row {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 10px;
+                }
+            </style>
+            <div id="layout-wrapper">
+                <div class="window">
+                    <div class="title-bar">
+                        <span>Interview Analyzer</span>
+                        <div class="title-bar-buttons"><span></span><span></span><span></span></div>
+                    </div>
+                    <div class="content">
+                        <div class="frame radio-frame">
+                            <label class="radio-label"><input type="radio" name="layout_mode" id="layout_interviewMode" checked> 面談分析</label>
+                            <label class="radio-label"><input type="radio" name="layout_mode" id="layout_dailyReportMode"> 日報分析</label>
+                            <label class="radio-label"><input type="radio" name="layout_mode" id="layout_qaMode"> AI対話</label>
+                        </div>
+                        <div class="description-label" id="layout_descriptionLabel">「面談分析」: Excel/CSVファイルまたはフォルダを選択</div>
+                        <div class="frame path-frame" id="layout_pathFrame">
+                            <div class="path-entry">分析対象のファイルまたはフォルダのパス...</div>
+                            <div class="btn">ファイル選択</div>
+                            <div class="btn">フォルダ選択</div>
+                        </div>
+                        <div class="btn run-button" id="layout_runButton">分析実行</div>
+                        <textarea class="log-area" readonly>処理状況や結果がここに表示されます...</textarea>
+                        <div class="frame delete-data-frame" id="layout_deleteDataFrame" style="display: none;">
+                            <div class="delete-data-row">
+                                <select class="path-entry" style="flex-grow: 2;"><option>削除対象を選択...</option></select>
+                                <div class="btn">削除対象リスト更新</div>
+                                <div class="btn">削除実行</div>
+                            </div>
+                        </div>
+                        <div class="frame chat-input-frame" id="layout_chatInputFrame" style="display: none;">
+                            <div class="chat-input-row">
+                                <input type="text" class="path-entry" placeholder="AIへの質問を入力してください">
+                                <div class="btn">送信</div>
+                            </div>
+                            <div class="btn">対話終了</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="usage">
+            <h2>使い方</h2>
+            <pre>
+# 面談分析ツール 利用ガイド
+
+## 概要
+このツールは、ExcelまたはCSV形式の面談データファイルを読み込み、AIが内容を要約・アドバイスを生成し、従業員ごとに個別のCSVファイルとして出力します。日報データについても同様に分析し、危険信号の判定も行います。さらに、生成された要約データをもとにAIに質問応答を行うことも可能です。
+
+---
+
+## 1. 事前準備：AIバックエンドの設定
+
+このツールは、Google Gemini API またはローカルで動作するOllamaのどちらかをAIバックエンドとして利用できます。
+
+### 1.1. `config.ini` の設定
+
+1.  `config.ini` ファイルをメモ帳などのテキストエディタで開きます。
+2.  `[ai_backend]` セクションの `ai_backend = gemini` または `ai_backend = ollama` を選択します。
+
+    ```ini
+    [ai_backend]
+    ai_backend = gemini  # または ollama
+    ```
+
+3.  選択したAIバックエンドに応じて、以下の設定を行います。
+
+### 1.2. Google Gemini API を使用する場合
+
+*   `[gemini]` セクションの `api_key = YOUR_API_KEY` と書かれている部分を、ご自身の有効なGemini APIキーに書き換えます。
+*   **オプション**: `model_version` を設定することで、使用するGeminiモデルのバージョンを指定できます。デフォルトは `gemini-1.5-flash` です。
+
+    ```ini
+    [gemini]
+    api_key = YOUR_API_KEY  # ご自身のGemini APIキーを設定
+    model_version = gemini-1.5-flash # 例: gemini-1.5-flash
+    ```
+
+### 1.3. Ollama を使用する場合
+
+Ollamaは、ローカルPCで大規模言語モデル（LLM）を実行するためのツールです。インターネット接続なしでAIを利用でき、プライバシー面でも優れています。
+
+#### 1.3.1. Ollama のインストール
+
+1.  Ollamaの公式サイトにアクセスします: [https://ollama.com/](https://ollama.com/)
+2.  お使いのOS（Windows, macOS, Linux）に合ったインストーラーをダウンロードし、指示に従ってインストールします。
+
+#### 1.3.2. モデルのダウンロード
+
+Ollamaをインストールしたら、利用したいLLMモデルをダウンロードします。例えば、`llama3` モデルをダウンロードするには、コマンドプロンプトまたはターミナルで以下のコマンドを実行します。
+
+```bash
+ollama run llama3
+```
+
+初回実行時にモデルが自動的にダウンロードされます。他のモデル（例: `mistral`, `gemma`）も同様にダウンロードできます。
+
+#### 1.3.3. `config.ini` の設定
+
+*   `[ollama]` セクションの `ollama_url` と `ollama_model` を設定します。
+    *   `ollama_url`: 通常は `http://localhost:11434` です。
+    *   `ollama_model`: ダウンロードしたモデル名（例: `llama3`）を設定します。
+
+    ```ini
+    [ollama]
+    ollama_url = http://localhost:11434
+    ollama_model = llama3  # ダウンロードしたモデル名を設定
+    ```
+
+---
+
+## 2. 実行方法
+
+1.  `interview_analyzer_gui.exe` をダブルクリックして実行します。
+2.  GUIアプリケーションが起動し、画面上で操作を行います。
+
+### モード1: 新しい面談ファイルを分析して要約を作成する
+
+1.  GUI上で「面談分析」ラジオボタンを選択します。
+2.  「分析対象のファイルまたはフォルダのパス」入力欄に、分析したいExcelまたはCSVファイルのパスを入力します。
+    *   **ファイル選択**: 「ファイル選択」ボタンをクリックしてファイルを選択します。
+    *   **フォルダ選択**: 「フォルダ選択」ボタンをクリックしてフォルダを選択します。
+    *   **ドラッグ＆ドロップ**: ファイルやフォルダを直接入力欄にドラッグ＆ドロップすることも可能です。
+    *   **複数のファイルがある場合**: 複数の面談データファイル（CSV/Excel）が格納されている**フォルダのパス**を指定することも可能です。その場合、フォルダ内のすべての対応ファイルが個別に処理されます。
+3.  「分析実行」ボタンをクリックします。
+4.  AIによる要約・アドバイス生成処理が完了するまで、しばらく待ちます。処理状況はログ表示エリアに表示されます。
+
+### モード2: 既存の要約データを使ってAIと対話する (チャット形式)
+
+1.  GUI上で「AI対話」ラジオボタンを選択します。
+2.  「AI対話開始」ボタンをクリックすると、**ローカルのSQLiteデータベースに保存された**既存の面談要約データと日報分析データが読み込まれ、AI対話セッションの準備が開始されます。準備状況はログ表示エリアに表示されます。
+3.  準備が完了すると、ログ表示エリアの下に質問入力フィールドと「送信」ボタンが表示されます。
+4.  質問入力フィールドにAIへの質問を入力し、「送信」ボタンをクリックします。
+5.  AIが**面談要約結果**フォルダと**日報分析結果**フォルダ内のすべてのデータを基に回答を生成し、ログ表示エリアに会話履歴として追記されます。
+6.  連続して質問を入力し、AIと対話できます。
+7.  AI対話セッションを終了したい場合は、「対話終了」ボタンをクリックします。UIが通常のモードに戻ります。
+
+### モード3: 日報データを分析する
+
+1.  GUI上で「日報分析」ラジオボタンを選択します。
+2.  「分析対象のファイルまたはフォルダのパス」入力欄に、分析したい日報Excelファイルのパスを入力します。
+    *   **ファイル選択**: 「ファイル選択」ボタンをクリックしてファイルを選択します。
+    *   **ドラッグ＆ドロップ**: ファイルを直接入力欄にドラッグ＆ドロップすることも可能です。
+3.  「分析実行」ボタンをクリックします。
+4.  `config.ini` で設定された期間（週ごとまたは月ごと）で日報が自動的に集計・分析されます。処理状況はログ表示エリアに表示されます。
+5.  AIによる要約、アドバイス、危険信号の判定処理が完了するまで、しばらく待ちます。
+
+**日報データの想定される列名:**
+*   `タイムスタンプ` (日付、形式: `YYYY/MM/DD HH:MM:SS`)
+*   `今日の体調`
+*   `今日の気分`
+*   `今日の業務内容`
+*   `業務での課題や悩み`
+*   `その他、共有事項`
+
+---
+
+## 3. 出力結果の確認
+
+モード1の要約・アドバイス生成処理が正常に完了すると、`interview_analyzer_gui.exe` と同じ階層に `面談要約結果` というフォルダが自動で作成されます。
+
+モード3の日報分析処理が正常に完了すると、`interview_analyzer_gui.exe` と同じ階層に `日報分析結果` というフォルダが自動で作成されます。
+
+これらのフォルダの中に、従業員ごとの分析結果（例: `山田太郎_要約データ.csv`、`鈴木花子_20240101-20240107_日報分析.csv`）が保存されています。
+
+**※元のデータファイルが上書きされたり、変更されたりすることは一切ありません。**
+            </pre>
+        </section>
+
+        <section id="system-diagram">
+            <h2>システム相関図</h2>
+            <pre>
+# システム相関図 - 面談データ分析AIツール (Interview Analyzer)
+
+## 概要
+
+本ドキュメントは、面談データ分析AIツール「Interview Analyzer」の主要なコンポーネントと、それらの間のデータの流れ、相互作用を示すシステム相関図です。
+
+## システム構成図 (テキストベース)
+
+```
++--------------------+
+|       ユーザー     |
+| (GUI操作)          |
++---------+----------+
+          |
+          | (1) モード選択 (新規分析 or 既存で対話 or 日報分析)
+          v
++--------------------+
+|  Interview Analyzer|
+|    (app_gui.py)    | --(I) 処理ログ出力--> +--------------------+
++---------+----------+                      |      logsフォルダ  |
+          | (2) 設定読み込み                | (YYYYMMDD_HHMMSS.log)|
+          v                                 +--------------------+
++--------------------+
+|     config.ini     |
+| (AIバックエンド選択)|
+| (APIキー/Ollama設定)|
+| (日報集計期間)     |
++--------------------+
+
+          +--------------------------------------------------+
+          | (モード1: 面談分析)                              | (モード3: 日報分析)
+          v                                                  v
++--------------------+                               +--------------------+
+| (3) ファイルパス入力 |                               | (A) 日報ファイル入力 |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (4) データ読み込み                               | (B) シートごとのデータ読込
+          v                                                  v
++--------------------+                               +--------------------+
+|   入力データファイル |                               |   入力日報ファイル |
+| (Excel/CSV)        |                               | (Excel)            |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (5) AIによるデータ構造分析                         | (C) 日報内容の期間集計
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |   データフレーム   |
+|    (Pandas)        |                               |    (Pandas)        |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (6) AI要約・アドバイス生成リクエスト             | (D) AI要約・アドバイス・危険信号判定リクエスト
+          v                                                  v
++--------------------+                               +--------------------+
+|    AIバックエンド  |                               |    AIバックエンド  |
+| (Google Gemini API)|                               | (Google Gemini API)|
+| (ローカル Ollama)  |                               | (ローカル Ollama)  |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (7) 要約・アドバイス応答                         | (E) 要約・アドバイス・危険信号応答
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |   データフレーム   |
+| (要約・アドバイス追加)|                               | (日報分析結果追加) |
++---------+----------+                               +---------+----------+
+          |                                                  |
+          | (8) 従業員別CSV出力                              | (F) 従業員・期間別CSV出力
+          v                                                  v
++--------------------+                               +--------------------+
+|   出力データファイル |                               |   出力データファイル |
+| (要約結果/個別CSV) |                               | (日報分析結果/個別CSV)|
++--------------------+                               +--------------------+
+          | (9) データベースへ保存                   | (G) データベースへ保存
+          v                                          v
++--------------------+
+|   Database (SQLite)|
+| (analyzer_data.db) |
++---------+----------+
+          ^                                          ^
+          | (H) 既存データ読込 (AI質問応答用)          |
+          |                                          |
++--------------------+                               +--------------------+
+| (モード2: 既存で対話) |                               |  AI質問応答セッション|
++--------------------+                               +---------+----------+
+          |                                                  |
+          v                                                  v
++--------------------+                               +--------------------+
+|   データフレーム   |                               |       ユーザー     |
+| (結合済み)         |                               | (AI回答表示)       |
+| (知識ベースとして利用) |                               +--------------------+
++--------------------+
+```
+
+## 主要コンポーネントとデータの流れ
+
+1.  **ユーザー**: ツールの操作者。モード選択、ファイル/ディレクトリパスの入力、AIへの質問を行う。**各処理完了後、GUIは操作可能な状態に戻ります。**
+2.  **Interview Analyzer (app_gui.py)**: ツールの主要なロジックを実装したPythonスクリプト。ユーザーからの入力を受け付け、データ処理、AI連携、ファイル出力、**データベースへの保存・読み込みも制御する**AI質問応答セッションを提供する。
+3.  **config.ini**: ツールの設定ファイル。使用するAIバックエンド（Gemini/Ollama）の選択、APIキーやOllamaサーバーのURL・モデル名、日報の集計期間などの設定情報を保持する。
+4.  **入力データファイル (面談)**: 分析対象となる面談データが格納されたファイル。Excel (.xlsx) または CSV (.csv) 形式に対応。複数従業員のデータが単一ファイルに集約されている形式、または従業員ごとの個別ファイルがフォルダに格納されている形式のいずれかを受け付ける。
+5.  **入力日報ファイル**: 分析対象となる日報データが格納されたExcelファイル (.xlsx)。各シートが1人の従業員の日報データに対応する。**タイムスタンプ列は `YYYY/MM/DD HH:MM:SS` 形式を想定します。**
+6.  **AIによるデータ構造分析 (面談)**: 入力面談データ（単一ファイルまたはディレクトリ内の各ファイル）のヘッダーとサンプルをAIに渡し、データ構造が「横持ち」か「縦持ち」かを判断させる。同時に、AIはデータ内の「従業員を識別する列/項目」「面談のフリーコメントを含む列/項目」「得意分野を示す列/項目」を**厳密に特定**する。縦持ちデータの場合は、この段階で横持ちへの変換に必要な情報（項目列名、値列名、各項目名）も特定される。
+7.  **データフレーム (Pandas)**: PythonのPandasライブラリによって管理される表形式のデータ。入力データを読み込み、AIによる構造分析と必要に応じた変換を経て、AI処理に適した統一的なデータ構造に整形される。
+8.  **AIバックエンド (Google Gemini API / ローカル Ollama)**: AIによる要約、アドバイス生成、危険信号判定、質問応答の処理を行う外部サービスまたはローカル環境。`config.ini` の設定に基づいて切り替えられる。
+    *   **Google Gemini API**: Googleが提供する大規模言語モデルAPI。インターネット経由で利用する。
+*   **ローカル Ollama**: ユーザーのPC上で動作するオープンソースの大規模言語言語モデル実行環境。HTTP API経由で利用する。
+9.  **出力データファイル (面談)**: AIによる要約・アドバイスが追加された面談データ。従業員ごとに個別のCSVファイルとして `面談要約結果` フォルダに出力される。ファイル名は従業員名を含む形式となる。
+10. **出力データファイル (日報)**: AIによる要約・アドバイス・危険信号が追加された日報データ。従業員ごと・期間ごとに個別のCSVファイルとして `日報分析結果` フォルダに出力される。ファイル名は従業員名と期間を含む形式となる。**危険信号の判断基準は、業務上の問題、体調不良のいずれか、または複数に該当するかを判断します。**
+11. **AI質問応答セッション**: **データベースに保存された**面談要約データと日報分析データの内容を知識ベースとして利用し、ユーザーからの質問に対してAIが回答を生成する対話型インターフェース。
+12. **logsフォルダ**: ツールの実行中に発生した処理の進捗、警告、エラーなどのログ情報が、日付と時刻を含むファイル名で自動的に格納されるディレクトリ。
+13. **Database (SQLite)**: 面談要約結果および日報分析結果を保存するローカルデータベース (`analyzer_data.db`)。AI質問応答機能の知識ベースとして利用される。
+
+## 凡例
+
+*   **四角い枠**: システムの主要なコンポーネントやデータストア
+*   **矢印**: データの流れや処理の方向
+*   **番号**: 処理の順序やデータのフローを示す
+*   **点線矢印**: オプションの処理フローや条件分岐
+*   **雲のアイコン**: 外部サービスやクラウド環境
+*   **PCのアイコン**: ローカル環境やユーザーのPC
+
+## フローの番号付けとドキュメント参照
+
+図中の番号は、以下のドキュメントの対応するセクションと関連しています。
+
+*   **要件定義書**: 各機能の要件定義
+*   **詳細設計書**: 各モジュールや関数の詳細な実装内容
+
+## 外部依存サービスの明記
+
+```
++--------------------+
+|       ユーザー     |
++---------+----------+
+          |
+          | (操作)
+          v
++--------------------+
+|  Interview Analyzer|
+|    (ローカルPC)    |
++---------+----------+
+          |
+          | (APIリクエスト)
+          v
++--------------------+
+|    AIバックエンド  |
+| (Google Gemini API)|
+| (ローカル Ollama)  |
++---------+----------+
+    |             |
+    |             |
+    v             v
++-------+     +-------+
+| Google|     | Ollama|
+| Cloud |     | (ローカル)|
+| (外部) |     |       |
++-------+     +-------+
+```
+            </pre>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- Sidebar navigation logic ---
+            const links = document.querySelectorAll('.sidebar a');
+            const sections = document.querySelectorAll('main section');
+
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        links.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    links.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const headerOffset = 60;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+
+            // --- GUI Layout interactive logic ---
+            const interviewMode = document.getElementById('layout_interviewMode');
+            const dailyReportMode = document.getElementById('layout_dailyReportMode');
+            const qaMode = document.getElementById('layout_qaMode');
+            const pathFrame = document.getElementById('layout_pathFrame');
+            const runButton = document.getElementById('layout_runButton');
+            const chatInputFrame = document.getElementById('layout_chatInputFrame');
+            const deleteDataFrame = document.getElementById('layout_deleteDataFrame');
+            const descriptionLabel = document.getElementById('layout_descriptionLabel');
+
+            function updateUILayout() {
+                if (qaMode.checked) {
+                    pathFrame.style.display = 'none';
+                    runButton.textContent = 'AI対話開始';
+                    chatInputFrame.style.display = 'flex';
+                    deleteDataFrame.style.display = 'flex';
+                    descriptionLabel.textContent = 'AI対話: 事前に分析が必要です。AI対話モードでは、チャット形式でAIと対話できます。';
+                } else {
+                    pathFrame.style.display = 'flex';
+                    runButton.textContent = '分析実行';
+                    chatInputFrame.style.display = 'none';
+                    deleteDataFrame.style.display = 'none';
+                    if (interviewMode.checked) {
+                        descriptionLabel.textContent = '面談分析: Excel/CSVファイルまたはフォルダを選択';
+                    } else if (dailyReportMode.checked) {
+                        descriptionLabel.textContent = '日報分析: Excelファイルを選択';
+                    }
+                }
+            }
+
+            interviewMode.addEventListener('change', updateUILayout);
+            dailyReportMode.addEventListener('change', updateUILayout);
+            qaMode.addEventListener('change', updateUILayout);
+            
+            // Initial UI setup for the layout demo
+            updateUILayout();
+        });
+    </script>
+</body>
+</html>

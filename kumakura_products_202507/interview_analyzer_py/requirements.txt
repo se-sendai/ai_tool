@@ -1,0 +1,6 @@
+pandas
+openpyxl
+google-generativeai
+configparser
+customtkinter
+tkinterdnd2

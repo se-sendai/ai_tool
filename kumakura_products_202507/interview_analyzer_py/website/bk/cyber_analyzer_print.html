@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analyzer - 説明資料</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20mm; /* 印刷時の余白 */
+            background-color: #fff;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px; /* 固定幅 */
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            color: #000; /* 黒に変更 */
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            border-bottom: 2px solid #ccc; /* 薄いグレーに変更 */
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+        }
+        h2 {
+            font-size: 1.8em;
+            border-bottom: 1px solid #ccc; /* 薄いグレーに変更 */
+            padding-bottom: 0.3em;
+            margin-bottom: 0.8em;
+        }
+        h3 {
+            font-size: 1.4em;
+            margin-bottom: 0.6em;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        ul {
+            margin-bottom: 1em;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2em;
+            margin-top: 2em;
+            margin-bottom: 1em;
+            color: #000; /* 黒に変更 */
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            color: #555; /* 少し濃いグレーに変更 */
+            margin-bottom: 2em;
+        }
+        .hero {
+            text-align: center;
+            padding: 50px 0;
+            background-color: #f8f8f8;
+            margin-bottom: 2em;
+        }
+        .hero h1 {
+            font-size: 3em;
+            color: #000; /* 黒に変更 */
+        }
+        .hero p {
+            font-size: 1.2em;
+            color: #555;
+        }
+        .hero img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+        .feature-grid-cyber, .process-grid-cyber, .tech-grid-cyber {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 1.5em;
+        }
+        .cyber-card, .process-step-cyber, .tech-card-cyber {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fefefe;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .cyber-card h3, .process-step-cyber h3, .tech-card-cyber h3 {
+            color: #000; /* 黒に変更 */
+        }
+        .icon-cyber, .process-icon-cyber {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            background-color: #eee; /* 薄いグレーに変更 */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            color: #000; /* 黒に変更 */
+            font-weight: bold;
+        }
+        .process-arrow-cyber {
+            display: none; /* 印刷時は矢印を非表示 */
+        }
+        .tech-card-cyber img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            background-color: #fff; /* ロゴ背景を白に */
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+        }
+        .comparison-table-cyber {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5em;
+        }
+        .comparison-table-cyber th, .comparison-table-cyber td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .comparison-table-cyber th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .comparison-table-cyber .check {
+            color: #48BB78;
+            font-weight: bold;
+        }
+        .comparison-table-cyber .cross {
+            color: #E53E3E;
+            font-weight: bold;
+        }
+        .faq-question-cyber {
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            color: #000; /* 黒に変更 */
+        }
+        .faq-question-cyber::before {
+            content: "・ ";
+            color: #000; /* 黒に変更 */
+            margin-right: 5px;
+        }
+        .faq-answer-cyber {
+            margin-bottom: 1em;
+            padding-left: 1.5em;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3em;
+            padding-top: 1em;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        /* 印刷用スタイル */
+        @media print {
+            body {
+                background-color: #fff !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact; /* 背景色を印刷 */
+            }
+            header, nav, .data-stream-animation, .timeline-cyber::before, .timeline-step-cyber, .process-arrow-cyber, footer {
+                display: none !important; /* 不要な要素を非表示 */
+            }
+            .container {
+                padding: 0 !important;
+            }
+            section {
+                page-break-before: always; /* 各セクションの前に改ページ */
+                padding: 10mm 0 !important;
+                border-bottom: none !important;
+            }
+            .hero {
+                background: none !important;
+                padding: 20mm 0 !important;
+            }
+            .hero h1, .hero p {
+                color: #000 !important;
+                text-shadow: none !important;
+            }
+            .cyber-card, .process-step-cyber, .tech-card-cyber {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            .tech-card-cyber img {
+                filter: none !important;
+                box-shadow: none !important;
+            }
+            .comparison-table-cyber th, .comparison-table-cyber td {
+                background-color: #f8f8f8 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>AIが面談と日報を、深く、鋭く、瞬時に解析。</h1>
+                <p>Interview Analyzerは、面談記録や日報のテキストデータから、個人のポテンシャルと組織の課題をAIが自動で分析・要約するツールです。これまで見過ごされてきた重要なサインを可視化し、客観的なデータに基づいた人材育成と組織改善をサポートします。</p>
+                </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Interview Analyzer: 3つのコア機能</h2>
+                <p class="section-subtitle">AIがあなたの組織の潜在能力を最大限に引き出します。</p>
+                <div class="feature-grid-cyber">
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+                        </div>
+                        <h3>面談分析 &amp; 要約</h3>
+                        <p>形式の異なる面談記録（Excel/CSV）をAIが自動で解析。従業員ごとの成果、課題、目標を構造化して要約し、具体的なアドバイスを生成。客観的なデータに基づいた1on1面談を実現します。</p>
+                    </div>
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 013.375-3.375h9.75a3.375 3.375 0 013.375 3.375v1.875m-17.25 4.5h16.5M5.25 6.75c0-1.518 1.5-2.75 3-2.75s3 1.232 3 2.75c0 1.518-1.5 2.75-3 2.75S5.25 8.268 5.25 6.75zM15.75 6.75c0-1.518 1.5-2.75 3-2.75s3 1.232 3 2.75c0 1.518-1.5 2.75-3 2.75S15.75 8.268 15.75 6.75z" /></svg>
+                        </div>
+                        <h3>AI対話（Q&amp;A）</h3>
+                        <p>蓄積された全従業員の面談・日報データを横断的に分析し、AIに直接質問できます。「最近退職リスクが高い従業員の傾向は？」「Aさんのスキルセットを活かせるプロジェクトは？」など、戦略的な人事判断をサポートします。</p>
+                    </div>
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75A2.25 2.25 0 0015.75 1.5H13.5m-3 0V3.75m3-2.25V3.75M9 11.25l3 3 3-3m-6 0h6" /></svg>
+                        </div>
+                        <h3>日報分析 &amp; 危険信号検知</h3>
+                        <p>日々の業務報告から、従業員のコンディションやエンゲージメントの変化をAIが自動で分析。ポジティブな変化だけでなく、バーンアウトや離職につながる「危険信号」を早期に検知し、プロアクティブなケアを可能にします。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </section>
+
+        <section id="how-to-use">
+            <div class="container">
+                <h2 class="section-title">簡単3ステップで利用開始</h2>
+                <p class="section-subtitle">複雑な設定は不要。すぐに分析を始められます。</p>
+                <div class="timeline-cyber">
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 1</span>
+                            <h3>設定</h3>
+                            <p><code>config.ini</code>ファイルに必要な情報を設定します。APIキーや、Ollamaを使用する場合はモデル名を指定するだけです。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 2</span>
+                            <h3>実行</h3>
+                            <p>分析したいファイルやフォルダをGUIから選択し、「分析実行」ボタンをクリック。AIが自動でデータを処理します。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 3</span>
+                            <h3>確認</h3>
+                            <p>処理が完了すると、<code>面談要約結果</code>フォルダに分析結果がCSVファイルとして出力されます。結果はデータベースにも保存され、いつでもAIとの対話に活用できます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </section>
+
+        <section id="deep-dive">
+            <div class="container">
+                <h2 class="section-title">解析プロセスの深層</h2>
+                <p class="section-subtitle">Interview Analyzerがどのようにデータを「知性」へと昇華させるのか。</p>
+                <div class="process-grid-cyber">
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">1</div>
+                        <h3>データ投入</h3>
+                        <p>ExcelまたはCSV形式の面談・日報データをシステムに投入。ファイル形式を問わず、AIが自動でデータ構造を認識します。</p>
+                    </div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">2</div>
+                        <h3>AIによる構造解析</h3>
+                        <p>AIがデータの「縦持ち」「横持ち」を判別し、従業員名、面談コメント、得意分野などの重要項目を正確に特定します。</p>
+                    </div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">3</div>
+                        <h3>テキスト抽出 &amp; 変換</h3>
+                        <p>特定された項目から必要なテキスト情報を抽出し、AIが解析しやすい形式に変換。ノイズを除去し、本質的な情報のみを抽出します。</p>
+                    </div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">4</div>
+                        <h3>AIによる要約・アドバイス生成</h3>
+                        <p>抽出されたテキストを基に、AIが面談結果の要約、具体的なアドバイス、日報の危険信号判定などを自動で生成します。</p>
+                    </div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">5</div>
+                        <h3>安全な出力 &amp; データベース保存</h3>
+                        <p>生成された分析結果は、個別のCSVファイルとして出力され、同時にローカルのセキュアなデータベースに保存されます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <div class="container">
+                <h2 class="section-title">システム構成</h2>
+                <p class="section-subtitle">ローカル環境で完結する、セキュアなアーキテクチャを採用しています。</p>
+                <div class="architecture-diagram-cyber">
+                    <div class="arch-box-cyber user">ユーザー (あなた)</div>
+                    <div class="arch-arrow-cyber">▼</div>
+                    <div class="arch-box-cyber app">Interview Analyzer.exe</div>
+                    <div class="arch-arrow-cyber">▼</div>
+                    <div class="arch-connectors-cyber">
+                        <div class="arch-line-cyber"></div>
+                        <div class="arch-bifurcation-cyber"></div>
+                        <div class="arch-line-cyber left"></div>
+                        <div class="arch-line-cyber right"></div>
+                    </div>
+                    <div class="arch-row-cyber">
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber file">Excel/CSV</div>
+                            <div class="arch-arrow-cyber small">▲</div>
+                            <div class="arch-box-cyber-label">入力</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber config">config.ini</div>
+                            <div class="arch-arrow-cyber small">▲</div>
+                            <div class="arch-box-cyber-label">設定</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber ai">AI (Gemini / Ollama)</div>
+                            <div class="arch-arrow-cyber small">▲▼</div>
+                            <div class="arch-box-cyber-label">分析</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber output">CSV / DB</div>
+                            <div class="arch-arrow-cyber small">▼</div>
+                            <div class="arch-box-cyber-label">出力</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-stack">
+            <div class="container">
+                <h2 class="section-title">搭載テクノロジー</h2>
+                <p class="section-subtitle">この革新的なツールを支える、最先端の技術スタック。</p>
+                <div class="tech-grid-cyber">
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python Logo">
+                        <h3>Python</h3>
+                        <p>堅牢なバックエンド処理とAI連携を可能にする、強力なプログラミング言語。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Pandas_logo.svg" alt="Pandas Logo">
+                        <h3>Pandas</h3>
+                        <p>複雑なデータ操作と分析を効率的に行うための、Pythonのデータ分析ライブラリ。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/1200px-Google_Gemini_logo.svg.png" alt="Google Gemini Logo">
+                        <h3>Google Gemini API</h3>
+                        <p>高度な自然言語処理と生成能力を提供する、Googleの最先端AIモデル。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://images.seeklogo.com/logo-png/59/1/ollama-logo-png_seeklogo-593420.png" alt="Ollama Logo">
+                        <h3>Ollama</h3>
+                        <p>ローカル環境で大規模言語モデルを実行し、プライバシーと柔軟性を提供。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" alt="SQLite Logo">
+                        <h3>SQLite</h3>
+                        <p>分析結果を安全かつ効率的に保存・管理するための軽量データベース。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <div class="container">
+                <h2 class="section-title">圧倒的なコストパフォーマンスとセキュリティ</h2>
+                <p class="section-subtitle">高価で複雑なSaaS型タレントマネジメントシステムとは一線を画す、あなたの組織のためのソリューションです。</p>
+                <table class="comparison-table-cyber">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>Interview Analyzer</th>
+                            <th>他社製品 (SaaS型)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>料金モデル</td>
+                            <td class="check">買い切り型ライセンス</td>
+                            <td>高額な月額課金</td>
+                        </tr>
+                        <tr>
+                            <td>データセキュリティ</td>
+                            <td class="check">ローカルPC内で完結</td>
+                            <td>クラウド上でデータを管理</td>
+                        </tr>
+                        <tr>
+                            <td>導入の容易さ</td>
+                            <td class="check">ダウンロードしてすぐ利用可能</td>
+                            <td>複雑な設定・契約・研修が必要</td>
+                        </tr>
+                        <tr>
+                            <td>AIバックエンド</td>
+                            <td class="check">Gemini / Ollama (選択可能)</td>
+                            <td>固定のAIモデル</td>
+                        </tr>
+                        <tr>
+                            <td>機能範囲</td>
+                            <td>面談・日報分析に特化</td>
+                            <td>人事評価・労務管理など多機能</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="faq">
+            <div class="container">
+                <h2 class="section-title">FAQ</h2>
+                <p class="section-subtitle">よくある質問と、その回答をまとめました。</p>
+                <div class="faq-container-cyber">
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">どんなファイル形式に対応していますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>面談データはExcel (.xlsx) と CSV (.csv) に、日報データはExcel (.xlsx) に対応しています。AIがファイル構造を自動で判別するため、面倒なフォーマット統一は不要です。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">分析したデータはどこに保存されますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>分析結果は、お使いのPCのローカル環境にある「面談要約結果」フォルダにCSVファイルとして保存されます。また、AIとの対話機能のために、同じくローカルのSQLiteデータベースにも保存されます。元のファイルが上書きされたり、外部にデータが送信されたりすることはありません。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">AIのAPIキーは必要ですか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>はい、Google Gemini APIを利用する場合は、ご自身のAPIキーを<code>config.ini</code>ファイルに設定する必要があります。また、ローカルで動作するOllamaもサポートしており、その場合はAPIキーは不要です。インターネットに接続できない環境でも分析を行えます。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">プログラミングの知識がなくても使えますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>はい、もちろんです。本ツールはGUIアプリケーションとして提供されるため、プログラミングの知識は一切不要です。ファイルやフォルダを選択し、ボタンをクリックするだけの直感的な操作で、どなたでも簡単にご利用いただけます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Interview Analyzer Project. All Rights Reserved. [DATA SECURED]</p>
+        </div>
+    </footer>
+
+    </script>
+</body>
+</html>

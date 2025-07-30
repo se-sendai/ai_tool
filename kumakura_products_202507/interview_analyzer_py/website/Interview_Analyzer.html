@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Analyzer - 意識の深淵をハックせよ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0A0A0F;
+            --bg-medium: #1A1A25;
+            --bg-light: #2A2A3A;
+            --neon-blue: #00FFFF;
+            --neon-purple: #FF00FF;
+            --neon-green: #00FF00;
+            --text-primary: #E0E0FF;
+            --text-secondary: #A0A0C0;
+            --border-color: #3A3A4A;
+            --glow-intensity: 0.8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                linear-gradient(to right, var(--border-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: grid-pulse 15s infinite alternate;
+        }
+
+        @keyframes grid-pulse {
+            0% { background-color: var(--bg-dark); }
+            50% { background-color: #08080C; }
+            100% { background-color: var(--bg-dark); }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,255,255,0.08) 0%, rgba(0,255,255,0) 70%);
+            animation: subtle-scanline 20s infinite linear;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes subtle-scanline {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        header {
+            background-color: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+            text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 4px var(--neon-blue),
+                    0 0 11px var(--neon-blue),
+                    0 0 19px var(--neon-blue),
+                    0 0 40px var(--neon-blue),
+                    0 0 80px var(--neon-blue),
+                    0 0 90px var(--neon-blue),
+                    0 0 100px var(--neon-blue),
+                    0 0 150px var(--neon-blue);
+            }
+            20%, 24%, 55% {        
+                text-shadow: none;
+            }
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 40px;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 2px;
+            background-color: var(--neon-purple);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-left: 30px; /* 少し間隔を狭める */
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-purple);
+            text-shadow: 0 0 8px var(--neon-purple);
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Timeline for How To Use */
+        .timeline-cyber {
+            position: relative;
+            max-width: 800px;
+            margin: 100px auto 0;
+            padding: 20px 0;
+        }
+
+        .timeline-cyber::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 100%;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .timeline-item-cyber {
+            padding: 20px 40px;
+            position: relative;
+            width: 50%;
+        }
+
+        .timeline-item-cyber:nth-child(odd) {
+            left: 0;
+            padding-left: 0;
+            text-align: right;
+        }
+
+        .timeline-item-cyber:nth-child(even) {
+            left: 50%;
+        }
+
+        .timeline-content-cyber {
+            background: var(--bg-medium);
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .timeline-content-cyber h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+        }
+
+        .timeline-step-cyber {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--neon-purple);
+            color: var(--bg-dark);
+            width: 80px;
+            height: 30px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+
+        .timeline-item-cyber:nth-child(odd) .timeline-step-cyber {
+            right: -40px;
+        }
+
+        .timeline-item-cyber:nth-child(even) .timeline-step-cyber {
+            left: -40px;
+        }
+
+        /* Process Grid */
+        .process-grid-cyber {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 80px;
+        }
+
+        .process-step-cyber {
+            background-color: rgba(26, 26, 37, 0.6);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            max-width: 280px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .process-step-cyber:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .process-icon-cyber {
+            width: 60px;
+            height: 60px;
+            background-color: var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--bg-dark);
+            margin: 0 auto 20px;
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .process-step-cyber h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .process-arrow-cyber {
+            font-size: 3rem;
+            color: var(--neon-purple);
+            margin: 0 10px;
+        }
+
+        /* Architecture Diagram */
+        .architecture-diagram-cyber {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .arch-box-cyber {
+            background: var(--bg-light);
+            border: 1px solid var(--neon-blue);
+            padding: 15px 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            text-align: center;
+        }
+        .arch-box-cyber.user { color: var(--neon-green); }
+        .arch-box-cyber.app { color: var(--text-primary); font-weight: 700; }
+        .arch-box-cyber.file { background-color: rgba(0, 255, 0, 0.1); border-color: var(--neon-green); }
+        .arch-box-cyber.config { background-color: rgba(255, 255, 0, 0.1); border-color: #FFFF00; }
+        .arch-box-cyber.ai { background-color: rgba(255, 0, 255, 0.1); border-color: var(--neon-purple); }
+        .arch-box-cyber.output { background-color: rgba(0, 255, 255, 0.1); border-color: var(--neon-blue); }
+
+        .arch-arrow-cyber {
+            color: var(--neon-blue);
+            font-size: 1.5rem;
+        }
+        .arch-arrow-cyber.small { font-size: 1rem; }
+
+        .arch-row-cyber {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .arch-box-cyber-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .arch-box-cyber-label { color: var(--text-secondary); font-size: 0.9rem; }
+
+        .arch-box-cyber {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .arch-box-cyber:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--neon-purple);
+        }
+
+        /* Tech Stack */
+        .tech-grid-cyber {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 80px;
+        }
+
+        .tech-card-cyber {
+            background-color: rgba(26, 26, 37, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tech-card-cyber:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .tech-card-cyber img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+            background-color: rgba(255, 255, 255, 0.05); /* 薄い背景色を追加 */
+            padding: 10px; /* パディングを追加 */
+            border-radius: 5px; /* 角を丸める */
+            box-shadow: 0 0 15px var(--neon-blue); /* ネオンシャドウを追加 */
+        }
+
+        .tech-card-cyber h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+        }
+
+        .tech-card-cyber p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison Table */
+        .comparison-table-cyber {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 80px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            background-color: rgba(26, 26, 37, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table-cyber th, .comparison-table-cyber td {
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            text-align: center;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .comparison-table-cyber th {
+            background-color: rgba(0, 255, 255, 0.1);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .comparison-table-cyber td:first-child {
+            text-align: left;
+            font-weight: 700;
+            color: var(--neon-green);
+        }
+        
+        .comparison-table-cyber .check {
+            color: var(--neon-green);
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .comparison-table-cyber .cross {
+            color: #E53E3E;
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #E53E3E;
+        }
+
+        .comparison-table-cyber tbody tr:hover {
+            background-color: rgba(0, 255, 255, 0.05);
+        }
+
+        /* FAQ Section */
+        .faq-container-cyber { max-width: 900px; margin: 80px auto 0; }
+        .faq-item-cyber { border-bottom: 1px solid var(--border-color); }
+        .faq-question-cyber {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            width: 100%;
+            text-align: left; /* 明示的に左揃え */
+            padding: 25px 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            /* cursor: pointer; */ /* カーソルを無効化 */
+            display: flex;
+            align-items: center;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .faq-question-cyber::before {
+            content: "・ ";
+            color: var(--neon-green);
+            margin-right: 10px;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        /* .faq-question-cyber span { color: var(--neon-green); margin-right: 15px; font-family: 'Orbitron', sans-serif; } */ /* Q.を削除したのでコメントアウト */
+        .faq-answer-cyber { 
+            max-height: none; /* 常に表示 */
+            overflow: visible; /* 常に表示 */
+            transition: none; /* アニメーション無効化 */
+            background: rgba(0,0,0,0.2); 
+        }
+        .faq-answer-cyber p { padding: 30px; font-size: 1.1rem; line-height: 1.8; }
+        .faq-item-cyber.active .faq-answer-cyber { max-height: none; }
+
+
+        /* CTA Section */
+        .cta-cyber {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: var(--text-primary);
+            text-align: center;
+            padding: 150px 0;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.7);
+            clip-path: polygon(0 5%, 100% 0, 100% 95%, 0% 100%);
+        }
+
+        .cta-cyber .section-title {
+            color: var(--text-primary);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .cta-cyber .section-subtitle {
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .cta-buttons-cyber {
+            margin-top: 80px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .btn-cyber-primary, .btn-cyber-secondary {
+            display: inline-block;
+            padding: 20px 50px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            border: 2px solid transparent;
+        }
+
+        .btn-cyber-primary {
+            background-color: var(--neon-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .btn-cyber-primary:hover {
+            background-color: var(--bg-dark);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 30px var(--neon-green), 0 0 50px rgba(0, 255, 0, 0.7);
+        }
+
+        .btn-cyber-secondary {
+            background-color: transparent;
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .btn-cyber-secondary:hover {
+            background-color: var(--neon-blue);
+            color: var(--bg-dark);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 30px var(--neon-blue), 0 0 50px rgba(0, 255, 255, 0.7);
+        }
+
+        section {
+            padding: 150px 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--neon-green);
+            text-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(0, 255, 0, 0.5);
+            animation: glitch 2s infinite alternate;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(0, 255, 0, 0.5); transform: translate(0); }
+            20% { text-shadow: none; transform: translate(-2px, 2px); }
+            40% { text-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(0, 255, 0, 0.5); transform: translate(2px, -2px); }
+            60% { text-shadow: none; transform: translate(-1px, 1px); }
+            80% { text-shadow: 0 0 15px var(--neon-green), 0 0 30px rgba(0, 255, 0, 0.5); transform: translate(1px, -1px); }
+            100% { text-shadow: none; transform: translate(0); }
+        }
+
+        .section-subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+            max-width: 900px;
+            margin: 0 auto 100px auto;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 200px 0;
+            background: linear-gradient(135deg, rgba(10, 10, 15, 0.8) 0%, rgba(5, 5, 8, 0.8) 100%), url('https://cdn.pixabay.com/photo/2019/08/06/22/48/artificial-intelligence-4389372_960_720.jpg') no-repeat center center;
+            background-size: cover;
+            border-bottom: none;
+            clip-path: polygon(0 0, 100% 0, 100% 95%, 0% 100%);
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 5.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.7);
+            animation: text-scan 3s infinite alternate;
+        }
+
+        @keyframes text-scan {
+            0% { text-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.7); }
+            50% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0, 255, 255, 0.4); }
+            100% { text-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 255, 255, 0.7); }
+        }
+
+        .hero p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            max-width: 1000px;
+            margin: 0 auto 60px auto;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .data-stream-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .data-stream-animation span {
+            position: absolute;
+            background-color: rgba(0, 255, 255, 0.1);
+            width: 2px;
+            height: 20px;
+            animation: data-flow 10s linear infinite;
+        }
+
+        @keyframes data-flow {
+            0% { transform: translateY(-100px) translateX(var(--x)); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(calc(100vh + 100px)) translateX(var(--x)); opacity: 0; }
+        }
+
+        /* Feature Cards */
+        .feature-grid-cyber {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 60px;
+            margin-top: 80px;
+        }
+
+        .cyber-card {
+            background-color: rgba(26, 26, 37, 0.6);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .cyber-card.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.7;
+            transition: opacity 0.4s ease;
+        }
+
+        .cyber-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .cyber-card:hover::before {
+            opacity: 1;
+        }
+
+        .cyber-card .icon-cyber {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+            background-color: var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px var(--neon-green);
+            animation: icon-pulse 2s infinite alternate;
+        }
+
+        @keyframes icon-pulse {
+            0% { box-shadow: 0 0 20px var(--neon-green); }
+            100% { box-shadow: 0 0 30px var(--neon-green), 0 0 50px rgba(0, 255, 0, 0.5); }
+        }
+
+        .cyber-card .icon-cyber svg {
+            width: 50px;
+            height: 50px;
+            color: var(--bg-dark);
+        }
+
+        .cyber-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .cyber-card p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        /* Comparison Table */
+        .comparison-table-cyber {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 80px;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            background-color: rgba(26, 26, 37, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table-cyber th, .comparison-table-cyber td {
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            text-align: center;
+            color: var(--text-primary);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .comparison-table-cyber th {
+            background-color: rgba(0, 255, 255, 0.1);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .comparison-table-cyber td:first-child {
+            text-align: left;
+            font-weight: 700;
+            color: var(--neon-green);
+        }
+        
+        .comparison-table-cyber .check {
+            color: var(--neon-green);
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .comparison-table-cyber .cross {
+            color: #E53E3E;
+            font-weight: 700;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #E53E3E;
+        }
+
+        .comparison-table-cyber tbody tr:hover {
+            background-color: rgba(0, 255, 255, 0.05);
+        }
+
+        /* CTA Section */
+        .cta-cyber {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: var(--text-primary);
+            text-align: center;
+            padding: 150px 0;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.7);
+            clip-path: polygon(0 5%, 100% 0, 100% 95%, 0% 100%);
+        }
+
+        .cta-cyber .section-title {
+            color: var(--text-primary);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .cta-cyber .section-subtitle {
+            color: var(--text-primary);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .cta-buttons-cyber {
+            margin-top: 80px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .btn-cyber-primary, .btn-cyber-secondary {
+            display: inline-block;
+            padding: 20px 50px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            border: 2px solid transparent;
+        }
+
+        .btn-cyber-primary {
+            background-color: var(--neon-green);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        .btn-cyber-primary:hover {
+            background-color: var(--bg-dark);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 30px var(--neon-green), 0 0 50px rgba(0, 255, 0, 0.7);
+        }
+
+        .btn-cyber-secondary {
+            background-color: transparent;
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .btn-cyber-secondary:hover {
+            background-color: var(--neon-blue);
+            color: var(--bg-dark);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 0 30px var(--neon-blue), 0 0 50px rgba(0, 255, 255, 0.7);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 80px 0;
+            border-top: 1px solid var(--neon-purple);
+            color: var(--text-secondary);
+            margin-top: 0;
+            box-shadow: 0 -10px 30px rgba(255, 0, 255, 0.2);
+            background-color: var(--bg-medium);
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">Interview Analyzer</a>
+            <div class="nav-links">
+                <a href="#features">機能</a>
+                <a href="#how-to-use">利用方法</a>
+                <a href="#deep-dive">解析プロセス</a>
+                <a href="#architecture">構成</a>
+                <a href="#tech-stack">技術</a>
+                <a href="#comparison">他社比較</a>
+                <a href="#faq">FAQ</a>
+                <a href="#contact">お問合せ</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="data-stream-animation"></div>
+            <div class="container">
+                <h1 id="typing-title"></h1>
+                <p>Interview Analyzerは、面談記録や日報のテキストデータから、個人のポテンシャルと組織の課題をAIが自動で分析・要約するツールです。これまで見過ごされてきた重要なサインを可視化し、客観的なデータに基づいた人材育成と組織改善をサポートします。</p>
+                </div>
+        </section>
+
+        <section id="features">
+            <div class="container">
+                <h2 class="section-title">Interview Analyzer: 3つのコア機能</h2>
+                <p class="section-subtitle">AIがあなたの組織の潜在能力を最大限に引き出します。</p>
+                <div class="feature-grid-cyber">
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+                        </div>
+                        <h3>面談分析 &amp; 要約</h3>
+                        <p>形式の異なる面談記録（Excel/CSV）をAIが自動で解析。従業員ごとの成果、課題、目標を構造化して要約し、具体的なアドバイスを生成。客観的なデータに基づいた1on1面談を実現します。</p>
+                    </div>
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 013.375-3.375h9.75a3.375 3.375 0 013.375 3.375v1.875m-17.25 4.5h16.5M5.25 6.75c0-1.518 1.5-2.75 3-2.75s3 1.232 3 2.75c0 1.518-1.5 2.75-3 2.75S5.25 8.268 5.25 6.75zM15.75 6.75c0-1.518 1.5-2.75 3-2.75s3 1.232 3 2.75c0 1.518-1.5 2.75-3 2.75S15.75 8.268 15.75 6.75z" /></svg>
+                        </div>
+                        <h3>AI対話（Q&amp;A）</h3>
+                        <p>蓄積された全従業員の面談・日報データを横断的に分析し、AIに直接質問できます。「最近退職リスクが高い従業員の傾向は？」「Aさんのスキルセットを活かせるプロジェクトは？」など、戦略的な人事判断をサポートします。</p>
+                    </div>
+                    <div class="cyber-card">
+                        <div class="icon-cyber">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75A2.25 2.25 0 0015.75 1.5H13.5m-3 0V3.75m3-2.25V3.75M9 11.25l3 3 3-3m-6 0h6" /></svg>
+                        </div>
+                        <h3>日報分析 &amp; 危険信号検知</h3>
+                        <p>日々の業務報告から、従業員のコンディションやエンゲージメントの変化をAIが自動で分析。ポジティブな変化だけでなく、バーンアウトや離職につながる「危険信号」を早期に検知し、プロアクティブなケアを可能にします。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </section>
+
+        <section id="how-to-use">
+            <div class="container">
+                <h2 class="section-title">簡単3ステップで利用開始</h2>
+                <p class="section-subtitle">複雑な設定は不要。すぐに分析を始められます。</p>
+                <div class="timeline-cyber">
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 1</span>
+                            <h3>設定</h3>
+                            <p><code>config.ini</code>ファイルに必要な情報を設定します。APIキーや、Ollamaを使用する場合はモデル名を指定するだけです。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 2</span>
+                            <h3>実行</h3>
+                            <p>分析したいファイルやフォルダをGUIから選択し、「分析実行」ボタンをクリック。AIが自動でデータを処理します。</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item-cyber">
+                        <div class="timeline-content-cyber">
+                            <span class="timeline-step-cyber">Step 3</span>
+                            <h3>確認</h3>
+                            <p>処理が完了すると、<code>面談要約結果</code>フォルダに分析結果がCSVファイルとして出力されます。結果はデータベースにも保存され、いつでもAIとの対話に活用できます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        </section>
+
+        <section id="deep-dive">
+            <div class="container">
+                <h2 class="section-title">解析プロセスの深層</h2>
+                <p class="section-subtitle">Interview Analyzerがどのようにデータを「知性」へと昇華させるのか。</p>
+                <div class="process-grid-cyber">
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">1</div>
+                        <h3>データ投入</h3>
+                        <p>ExcelまたはCSV形式の面談・日報データをシステムに投入。ファイル形式を問わず、AIが自動でデータ構造を認識します。</p>
+                    </div>
+                    <div class="process-arrow-cyber">→</div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">2</div>
+                        <h3>AIによる構造解析</h3>
+                        <p>AIがデータの「縦持ち」「横持ち」を判別し、従業員名、面談コメント、得意分野などの重要項目を正確に特定します。</p>
+                    </div>
+                    <div class="process-arrow-cyber">→</div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">3</div>
+                        <h3>テキスト抽出 &amp; 変換</h3>
+                        <p>特定された項目から必要なテキスト情報を抽出し、AIが解析しやすい形式に変換。ノイズを除去し、本質的な情報のみを抽出します。</p>
+                    </div>
+                    <div class="process-arrow-cyber">→</div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">4</div>
+                        <h3>AIによる要約・アドバイス生成</h3>
+                        <p>抽出されたテキストを基に、AIが面談結果の要約、具体的なアドバイス、日報の危険信号判定などを自動で生成します。</p>
+                    </div>
+                    <div class="process-arrow-cyber">→</div>
+                    <div class="process-step-cyber">
+                        <div class="process-icon-cyber">5</div>
+                        <h3>安全な出力 &amp; データベース保存</h3>
+                        <p>生成された分析結果は、個別のCSVファイルとして出力され、同時にローカルのセキュアなデータベースに保存されます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture">
+            <div class="container">
+                <h2 class="section-title">システム構成</h2>
+                <p class="section-subtitle">ローカル環境で完結する、セキュアなアーキテクチャを採用しています。</p>
+                <div class="architecture-diagram-cyber">
+                    <div class="arch-box-cyber user">ユーザー (あなた)</div>
+                    <div class="arch-arrow-cyber">▼</div>
+                    <div class="arch-box-cyber app">Interview Analyzer.exe</div>
+                    <div class="arch-arrow-cyber">▼</div>
+                    <div class="arch-connectors-cyber">
+                        <div class="arch-line-cyber"></div>
+                        <div class="arch-bifurcation-cyber"></div>
+                        <div class="arch-line-cyber left"></div>
+                        <div class="arch-line-cyber right"></div>
+                    </div>
+                    <div class="arch-row-cyber">
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber file">Excel/CSV</div>
+                            <div class="arch-arrow-cyber small">▲</div>
+                            <div class="arch-box-cyber-label">入力</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber config">config.ini</div>
+                            <div class="arch-arrow-cyber small">▲</div>
+                            <div class="arch-box-cyber-label">設定</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber ai">AI (Gemini / Ollama)</div>
+                            <div class="arch-arrow-cyber small">▲▼</div>
+                            <div class="arch-box-cyber-label">分析</div>
+                        </div>
+                        <div class="arch-box-cyber-group">
+                            <div class="arch-box-cyber output">CSV / DB</div>
+                            <div class="arch-arrow-cyber small">▼</div>
+                            <div class="arch-box-cyber-label">出力</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech-stack">
+            <div class="container">
+                <h2 class="section-title">搭載テクノロジー</h2>
+                <p class="section-subtitle">この革新的なツールを支える、最先端の技術スタック。</p>
+                <div class="tech-grid-cyber">
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python Logo">
+                        <h3>Python</h3>
+                        <p>堅牢なバックエンド処理とAI連携を可能にする、強力なプログラミング言語。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Pandas_logo.svg" alt="Pandas Logo">
+                        <h3>Pandas</h3>
+                        <p>複雑なデータ操作と分析を効率的に行うための、Pythonのデータ分析ライブラリ。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/1200px-Google_Gemini_logo.svg.png" alt="Google Gemini Logo">
+                        <h3>Google Gemini API</h3>
+                        <p>高度な自然言語処理と生成能力を提供する、Googleの最先端AIモデル。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://images.seeklogo.com/logo-png/59/1/ollama-logo-png_seeklogo-593420.png" alt="Ollama Logo">
+                        <h3>Ollama</h3>
+                        <p>ローカル環境で大規模言語モデルを実行し、プライバシーと柔軟性を提供。</p>
+                    </div>
+                    <div class="tech-card-cyber">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" alt="SQLite Logo">
+                        <h3>SQLite</h3>
+                        <p>分析結果を安全かつ効率的に保存・管理するための軽量データベース。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <div class="container">
+                <h2 class="section-title">圧倒的なコストパフォーマンスとセキュリティ</h2>
+                <p class="section-subtitle">高価で複雑なSaaS型タレントマネジメントシステムとは一線を画す、あなたの組織のためのソリューションです。</p>
+                <table class="comparison-table-cyber">
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>Interview Analyzer</th>
+                            <th>他社製品 (SaaS型)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>料金モデル</td>
+                            <td class="check">買い切り型ライセンス</td>
+                            <td>高額な月額課金</td>
+                        </tr>
+                        <tr>
+                            <td>データセキュリティ</td>
+                            <td class="check">ローカルPC内で完結</td>
+                            <td>クラウド上でデータを管理</td>
+                        </tr>
+                        <tr>
+                            <td>導入の容易さ</td>
+                            <td class="check">ダウンロードしてすぐ利用可能</td>
+                            <td>複雑な設定・契約・研修が必要</td>
+                        </tr>
+                        <tr>
+                            <td>AIバックエンド</td>
+                            <td class="check">Gemini / Ollama (選択可能)</td>
+                            <td>固定のAIモデル</td>
+                        </tr>
+                        <tr>
+                            <td>機能範囲</td>
+                            <td>面談・日報分析に特化</td>
+                            <td>人事評価・労務管理など多機能</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="faq">
+            <div class="container">
+                <h2 class="section-title">FAQ</h2>
+                <p class="section-subtitle">よくある質問と、その回答をまとめました。</p>
+                <div class="faq-container-cyber">
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">どんなファイル形式に対応していますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>面談データはExcel (.xlsx) と CSV (.csv) に、日報データはExcel (.xlsx) に対応しています。AIがファイル構造を自動で判別するため、面倒なフォーマット統一は不要です。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">分析したデータはどこに保存されますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>分析結果は、お使いのPCのローカル環境にある「面談要約結果」フォルダにCSVファイルとして保存されます。また、AIとの対話機能のために、同じくローカルのSQLiteデータベースにも保存されます。元のファイルが上書きされたり、外部にデータが送信されたりすることはありません。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">AIのAPIキーは必要ですか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>はい、Google Gemini APIを利用する場合は、ご自身のAPIキーを<code>config.ini</code>ファイルに設定する必要があります。また、ローカルで動作するOllamaもサポートしており、その場合はAPIキーは不要です。インターネットに接続できない環境でも分析を行えます。</p>
+                        </div>
+                    </div>
+                    <div class="faq-item-cyber active">
+                        <div class="faq-question-cyber">プログラミングの知識がなくても使えますか？</div>
+                        <div class="faq-answer-cyber">
+                            <p>はい、もちろんです。本ツールはGUIアプリケーションとして提供されるため、プログラミングの知識は一切不要です。ファイルやフォルダを選択し、ボタンをクリックするだけの直感的な操作で、どなたでも簡単にご利用いただけます。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Interview Analyzer Project. All Rights Reserved. [DATA SECURED]</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // スクロールアニメーション
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.cyber-card').forEach(card => {
+                observer.observe(card);
+            });
+
+            // データストリームアニメーション
+            const dataStreamContainer = document.querySelector('.data-stream-animation');
+            if (dataStreamContainer) {
+                const numStreams = 50;
+                for (let i = 0; i < numStreams; i++) {
+                    const span = document.createElement('span');
+                    span.style.left = `${Math.random() * 100}%`;
+                    span.style.animationDelay = `${Math.random() * 10}s`;
+                    span.style.animationDuration = `${5 + Math.random() * 10}s`;
+                    span.style.setProperty('--x', `${(Math.random() - 0.5) * 200}px`); // 横方向のランダムな動き
+                    dataStreamContainer.appendChild(span);
+                }
+            }
+
+            // Typing Effect
+            const typingTitle = document.getElementById('typing-title');
+            const textToType = "AIが面談と日報を、深く、鋭く、瞬時に解析。";
+            let i = 0;
+            function typeWriter() {
+                if (i < textToType.length) {
+                    typingTitle.innerHTML += textToType.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100); // 文字をタイプする速度
+                } else {
+                    // カーソル点滅のアニメーションを追加
+                    typingTitle.style.borderRight = '0.15em solid var(--neon-blue)';
+                    setInterval(() => {
+                        typingTitle.style.borderRightColor = typingTitle.style.borderRightColor === 'transparent' ? 'var(--neon-blue)' : 'transparent';
+                    }, 500);
+                }
+            }
+            typeWriter();
+        });
+    </script>
+</body>
+</html>
