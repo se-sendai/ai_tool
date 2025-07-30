@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日報要約AI & Chatwork連携ツール 取扱説明書</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="content">
+        <h1>日報要約AI & Chatwork連携ツール 取扱説明書</h1>
+
+<h2>1. このツールについて</h2>
+
+<p>このツールは、Google Apps Script (GAS) を利用して、日報業務と1on1面談の準備を効率化・自動化します。</p>
+
+<ul>
+<li><strong>日報の自動収集</strong>: ChatworkのBotが、毎日決まった時刻に各メンバーへ日報提出を促します。</li>
+<li><strong>AIによるコンディション分析</strong>: 提出された日報の内容をGemini APIが分析し、メンバーのコンディションを「良い」「普通」「少し悪い」「悪い」の4段階で評価します。さらに、内容にネガティブな兆候が見られる場合は「危険」と評価することもあります。</li>
+<li><strong>自動アラート通知</strong>: AIの評価が「危険」「少し悪い」「悪い」の場合に、担当マネージャーのChatworkにアラートを送信し、早期対応を促します。</li>
+<li><strong>活動ログの自動蓄積</strong>: 分析したすべての日報データとAIの評価結果は、Googleスプレッドシートに自動で記録・蓄積され、メンバーごとの個別シートにも記録されるため、後から分析や振り返りに活用できます。</li>
+
+</ul>
+
+<h2>2. 導入と初期設定</h2>
+
+<h3>STEP 1: Chatwork APIキーの準備</h3>
+
+<p>Chatwork APIを利用するために、APIキーを発行する必要があります。
+管理者権限を持つアカウントでChatworkにログインし、<a href="https://www.chatwork.com/service/packages/chatwork/subpackages/api/token.php">API設定</a>からAPIトークンを発行してください。発行したAPIキーは安全な場所に保管してください。<strong>ここでAPIキーを発行したChatworkアカウントが、当ツールにおける「BOT」として動作し、日報の質問送信などを自動で行います。</strong></p>
+
+<h3>STEP 2: スプレッドシートの準備とコードの配置</h3>
+
+<ol>
+<li><strong>新規スプレッドシート作成</strong>: Googleドライブで新しいスプレッドシートを作成します。このファイルがツールの管理画面になります。</li>
+<li><strong>GASエディタを開く</strong>: メニューから <code>拡張機能</code> &gt; <code>Apps Script</code> を選択します。</li>
+<li><strong>コードの貼り付け</strong>: <code>src/Main.gs</code> の中身をすべてコピーし、GASエディタに貼り付けて保存します。（元からある<code>function myFunction() {}</code>などのコードは消してください）</li>
+</ol>
+
+<h3>STEP 3: シートの作成とヘッダー設定</h3>
+
+<p>スプレッドシートに、以下の3つのシートを正確な名前で作成し、各1行目に指定のヘッダーを入力してください。また、<strong>メンバーごとの日報ログシートは、日報が初めて記録される際に自動で作成されます。</strong></p>
+
+<ol>
+<li><strong><code>Chatwork設定</code>シート</strong>: 誰に日報を依頼し、誰がその報告を受けるかを定義します。
+<table><thead><tr><th>A列</th><th>B列</th><th>C列</th><th>D列</th><th>E列</th></tr></thead><tbody><tr><td>グループ名</td><td>氏名</td><td>ルームID</td><td>役割</td><td>週次レポートモード</td></tr></table>
+<ul>
+<li><strong>グループ名</strong>: マネージャーと社員を紐付けるための名前です（例: <code>営業チーム</code>）。</li>
+<li><strong>氏名</strong>: ユーザーのフルネームを記入します。</li>
+<li><strong>ルームID</strong>: <strong>BOTと各ユーザー（社員・マネージャー）間のダイレクトメッセージのルームID</strong>を記入します。ルームIDは、Chatworkで対象のDMを開いた際のURLに含まれる<code>#!rid</code>以降の数字です。</li>
+<li><strong>役割</strong>: <code>manager</code> または <code>employee</code> のいずれかを小文字で入力します。</li>
+<li><strong>週次レポートモード</strong>: <code>manager</code>の行に設定します。<code>team</code>と入力するとチーム全体の要約レポート、<code>individual</code>と入力するとメンバーごとの日報をまとめたレポートが通知されます。<strong>空欄の場合は<code>individual</code>として動作します。</strong></li>
+</ul>
+</li>
+<li><strong><code>日報ログ</code>シート</strong>: 提出された全ての日報データが蓄積されます。
+<table><thead><tr><th>A列</th><th>B列</th><th>C列</th><th>D列</th><th>E列</th><th>F列</th><th>G列</th><th>H列</th><th>I列</th></tr></thead><tbody><tr><td>タイムスタンプ</td><td>氏名</td><td>マネージャー</td><td>日報日付</td><td>今日の業務内容</td><td>今日の気分</td><td>困っていること</td><td>AI評価状態</td><td>AI評価理由</td></tr></table>
+<ul>
+<li><strong>タイムスタンプ</strong>: ログが記録された日時。</li>
+<li><strong>氏名</strong>: 日報提出者の氏名。</li>
+<li><strong>マネージャー</strong>: 担当マネージャーの氏名。</li>
+<li><strong>日報日付</strong>: 日報の対象日。</li>
+<li><strong>今日の業務内容</strong>: 日報から抽出した業務内容。</li>
+<li><strong>今日の気分</strong>: 日報から抽出した気分。</li>
+<li><strong>困っていること</strong>: 日報から抽出した困っていること。</li>
+<li><strong>AI評価状態</strong>: Gemini APIによる4段階評価（＋危険）の結果。</li>
+<li><strong>AI評価理由</strong>: 上記評価の根拠。</li>
+</ul>
+</li>
+<li><strong><code>BOT質問ログ</code>シート</strong>: Botが送信した質問の履歴と、それに対する返信状況を管理します。このシートのステータスが未処理（例: 未返信、エラー）のままだと、次回の日報送信の対象外となる場合があります。
+<table><thead><tr><th>A列</th><th>B列</th><th>C列</th><th>D列</th><th>E列</th></tr></thead><tbody><tr><td>ルームID</td><td>質問ID</td><td>送信日時</td><td>ステータス</td><td>エラー詳細</td></tr></table>
+<ul>
+<li><strong>ルームID</strong>: 質問を送信したChatworkのルームID。</li>
+<li><strong>質問ID</strong>: 送信した質問メッセージのID。</li>
+<li><strong>送信日時</strong>: 質問を送信した日時。</li>
+<li><strong>ステータス</strong>: <code>未返信</code>, <code>返信済み_処理成功</code>, <code>返信済み_フォーマット不正</code>, <code>エラー発生_...</code>など。</li>
+<li><strong>エラー詳細</strong>: エラー発生時の詳細情報。</li>
+</ul>
+</li>
+<li><strong><code>メンバー別日報ログ</code>シート</strong>: このシートは、「日報返信の収集・分析」機能が実行されると、メンバーごとに自動で作成されます。<strong>利用者側で事前に作成する必要はありません。</strong>
+<table><thead><tr><th>A列</th><th>B列</th><th>C列</th><th>D列</th><th>E列</th></tr></thead><tbody><tr><td>タイムスタンプ</td><td>日報日付</td><td>今日の業務内容</td><td>今日の気分</td><td>困っていること</td></tr></table>
+</li>
+
+<h3>STEP 4: スクリプトプロパティの設定</h3>
+
+<p>GASエディタの左メニューにある歯車アイコン（<code>プロジェクトの設定</code>）をクリックし、「スクリプト プロパティ」のセクションで <code>＋ スクリプト プロパティを追加</code> をクリックし、以下の情報を追加します。</p>
+
+<table><thead><tr><th>プロパティ名</th><th>値の例</th><th>説明</th></tr></thead><tbody><tr><td><code>CHATWORK_API_KEY</code></td><td><code>a1b2c3d4e5f6...</code></td><td><strong>【必須】</strong> STEP 1で取得したChatwork APIキー。</td></tr><tr><td><code>GEMINI_API_KEY</code></td><td><code>AIzaSy...</code></td><td><strong>【必須】</strong> あなたのGemini APIキー。</td></tr><tr><td><code>CHATWORK_BOT_ACCOUNT_ID</code></td><td><code>123456789</code></td><td><strong>【必須】</strong> BOT自身のChatworkアカウントID。初回実行時に自動取得されますが、手動設定も可能です。</td></tr><tr><td><code>DAILY_QUESTION_TIME_HOUR</code></td><td><code>9</code></td><td>(任意) 日報質問メッセージを送信する時刻（時、24時間表記）。デフォルトは9時。</td></tr><tr><td><code>DAILY_QUESTION_TIME_MINUTE</code></td><td><code>0</code></td><td>(任意) 日報質問メッセージを送信する時刻（分）。デフォルトは0分。</td></tr>
+<tr><td><code>DAILY_REPLY_COLLECT_TIME_HOUR</code></td><td><code>18</code></td><td>(任意) 日報返信を収集・分析する時刻（時、24時間表記）。デフォルトは18時。</td></tr>
+<tr><td><code>DAILY_REPLY_COLLECT_TIME_MINUTE</code></td><td><code>0</code></td><td>(任意) 日報返信を収集・分析する時刻（分）。デフォルトは0分。</td></tr></tbody></table>
+
+<h2>3. ツールの使い方</h2>
+
+<h3>3.1. 定期実行トリガーの設定</h3>
+
+<ol>
+<li>スプレッドシートを開き、カスタムメニューの <code>日報AIツール</code> &gt; <code>定期実行トリガーを設定</code> をクリックします。</li>
+<li>初回実行時、Googleからスクリプトの実行に関する承認を求められます。内容を確認し、許可してください。</li>
+<li>これにより、毎日決まった時刻（スクリプトプロパティで設定可能、デフォルト: 質問9時、収集18時）に日報の送受信が自動的に行われます。また、毎週月曜日の深夜には古いBOT質問ログのクリーンアップも自動実行されます。</li>
+</ol>
+
+<p><span style="color: red;">【重要】</span>トリガーの実行時刻について: Apps Scriptの時限トリガーは、設定した正確な時刻に実行されるものではなく、<strong>指定した時刻の前後15分程度の範囲内で実行されます。</strong> これはGoogleのGoogleのサーバー負荷状況による仕様です。</p>
+
+<h3>3.2. 日報の提出フロー（社員向け）</h3>
+
+<ol>
+<li>Botから「本日の日報を...」というメッセージが届きます。</li>
+<li>そのメッセージに<strong style="color: red;">返信</strong>する形で、以下のフォーマットに従って日報を記述し、送信します。</li>
+</ol>
+
+<pre><code>#日報
+業務内容：今日のタスクAとBを完了しました。
+気分：良い
+困っていること：特になし
+</code></pre>
+
+<h3>3.3. 週次レポートの生成（マネージャー向け）</h3>
+
+<p>この機能は、チーム全体の日報ログから過去1週間分のコンディションの傾向を分析し、週次レポートを生成してマネージャーに通知します。レポート形式は<code>Chatwork設定</code>シートの<code>週次レポートモード</code>列で制御できます。</p>
+
+<ol>
+<li><strong>手動実行</strong>:
+<ul>
+<li>スプレッドシートのメニュー <code>日報AIツール</code> &gt; <code>週次レポート生成</code> をクリックします。</li>
+<li>実行後、<code>Chatwork設定</code>シートで<code>manager</code>として設定されているユーザーのChatworkに、設定に応じた週次レポートが通知されます。</li>
+</ul>
+</li>
+<li><strong>自動実行</strong>:
+<ul>
+<li><code>日報AIツール</code> &gt; <code>定期実行トリガーを設定</code> を実行すると、毎週月曜日の午前10時（デフォルト設定）に自動でレポートが生成され、マネージャーに通知されます。</li>
+</ul>
+</li>
+</ol>
+
+<h2>4. トラブルシューティング</h2>
+
+<ul>
+<li><strong>Q. 日報の質問が届きません。</strong>
+<ul>
+<li>A1: <code>定期実行トリガーを設定</code>が実行されているか確認してください。</li>
+<li>A2: <code>Chatwork設定</code>シートのあなたの情報（ルームID、役割など）が正しいか確認してください。</li>
+<li>A3: <code>BOT質問ログ</code>シートに、あなたの前日分の日報が「未返信」や「エラー」のまま残っていませんか？その場合、当日の質問はスキップされます。</li>
+</ul>
+</li>
+<li><strong>Q. 日報を提出したのに「フォーマット不正」とログに残ってしまいます。</strong>
+<ul>
+<li>A1: Botのメッセージに<strong>返信</strong>していますか？新規メッセージで送ると認識されません。</li>
+<li>A2: <code>#日報</code> <code>業務内容：</code> <code>気分：</code> <code>困っていること：</code> のキーワードが正確に含まれていますか？（コロンは全角でも半角でも可）</li>
+<li>A3: 「気分」は <code>良い</code> <code>普通</code> <code>少し悪い</code> <code>悪い</code> のいずれかになっていますか？</li>
+</ul>
+</li>
+
+</ul>
+
+<hr>
+<p>最終更新日: 2025/07/29</p>
+    </div>
+</body>
+</html>

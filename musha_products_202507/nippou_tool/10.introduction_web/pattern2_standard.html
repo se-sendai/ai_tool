@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日報AIツール | AIで日報業務を効率化し、マネジメントをサポート</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chosen Palette: Sky Blue, Amber, Slate - Professional and Trustworthy -->
+    <!-- Application Structure Plan: A sales proposal-oriented landing page. It starts with a strong problem statement, directly followed by our AI-powered solution. Key features are presented with a focus on client benefits, leading to a clear implementation flow and FAQs addressing common concerns. This structure is designed to guide a client through the value proposition, addressing their pain points and demonstrating how the tool offers a tangible solution, culminating in a direct call to action for a consultation or demo. -->
+    <!-- Visualization & Content Choices:
+    - Header: Goal: Navigate. Method: Sticky navigation. Interaction: Smooth scroll. Justification: Easy access to sections. Library: HTML/CSS.
+    - Hero Section: Goal: Engage & State Problem/Solution. Method: Bold headline, empathetic sub-headline, relevant image. Interaction: None. Justification: Immediately captures attention and sets the stage for the solution. Library: HTML/CSS.
+    - Problem Section: Goal: Empathize & Quantify Pain. Method: Icon-driven cards with concise problem descriptions. Interaction: None. Justification: Directly addresses common business challenges, making the client feel understood. Library: HTML/CSS/Unicode.
+    - Features Section: Goal: Inform & Differentiate. Method: AI-focused feature blocks with clear benefit statements. Interaction: None. Justification: Highlights core functionalities and how they uniquely solve the identified problems, emphasizing AI's role. Library: HTML/CSS/Unicode.
+    - Flow Section: Goal: Reassure & Guide. Method: Simple, numbered steps for easy adoption. Interaction: None. Justification: Demystifies the implementation process, reducing perceived barriers. Library: HTML/CSS.
+    - FAQ Section: Goal: Address Concerns. Method: Q&A format. Interaction: None. Justification: Proactively answers common client questions, building trust. Library: HTML/CSS.
+    - CTA Section: Goal: Convert. Method: Prominent call to action with contact information. Interaction: Click. Justification: Directs potential clients to the next step. Library: HTML/CSS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-sky-800"><i class="fas fa-brain-circuit mr-2"></i>日報AIツール</div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#problem" class="hover:text-sky-600">お客様の課題</a>
+                <a href="#features" class="hover:text-sky-600">本ツールの解決策</a>
+                <a href="#flow" class="hover:text-sky-600">導入ステップ</a>
+                <a href="#faq" class="hover:text-sky-600">導入前の疑問にお答えします</a>
+            </nav>
+            <!-- ヘッダーの資料請求・お問い合わせボタンを削除 -->
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-sky-700 text-white py-24 px-4">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">日報業務の負担をAIで軽減<br>マネジメントを効率化する、シンプルなツール</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">日々の報告業務の効率化と、メンバーのコンディション把握をサポート。<br class="md:hidden">お客様のChatworkとGoogle Workspace環境で手軽に導入可能です。</p>
+            <img src="https://placehold.co/800x400/e0f2fe/0c4a6e?text=AI%20Powered%20Management%20Tool" alt="AI Powered Management Tool" class="mx-auto rounded-lg shadow-2xl border-4 border-white">
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="py-20 px-4 bg-amber-50">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-12 text-gray-700">お客様の日報運用、こんな課題を抱えていませんか？</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <i class="fas fa-clock text-5xl text-amber-500 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-3">日報確認・集計の手間</h3>
+                    <p>メンバーが増えるほど、日報の確認や集計作業がマネージャーの負担に。時間消費が大きく、本来の業務に集中しにくい。</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <i class="fas fa-comments text-5xl text-amber-500 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-3">対話の質の低下</h3>
+                    <p>多忙な業務の中で、メンバー一人ひとりと向き合う時間が不足し、対話の質が低下していませんか？</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <i class="fas fa-users-viewfinder text-5xl text-amber-500 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-3">メンバーのコンディション把握</h3>
+                    <p>日報のテキストだけではメンバーのコンディション変化や潜在的な課題に気づきにくく、適切なサポートが遅れてしまうことも。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4 bg-white">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-12 text-sky-800">日報AIツールが、お客様の課題解決をサポートします</h2>
+            <div class="space-y-16">
+                <!-- Feature 1: Daily Analysis -->
+                <div class="flex flex-col md:flex-row items-center gap-10">
+                    <div class="md:w-1/2">
+                        <img src="https://placehold.co/600x400/e0f2fe/0c4a6e?text=AI%20Analysis%20Chatwork" alt="AI Analysis Chatwork" class="rounded-lg shadow-xl">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h3 class="text-3xl font-bold mb-4 text-sky-700"><i class="fas fa-robot mr-2"></i>日報の自動収集とAIによるコンディション分析</h3>
+                        <p class="text-lg mb-4">
+                            Chatworkで日報の提出依頼から収集までを自動化。提出された日報はGemini AIが内容を分析し、メンバーのコンディションを5段階（良い/普通/少し悪い/悪い/危険）で評価します。評価が「危険」「少し悪い」「悪い」の場合、AIがその理由を添えてマネージャーに自動でアラート通知。早期のフォローアップを可能にします。
+                        </p>
+                        <span class="bg-sky-100 text-sky-800 px-3 py-1 rounded-full font-semibold">#業務効率化</span>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">#コンディション把握</span>
+                    </div>
+                </div>
+                <!-- Feature 2: Weekly Report -->
+                <div class="flex flex-col md:flex-row-reverse items-center gap-10">
+                    <div class="md:w-1/2">
+                        <img src="https://placehold.co/600x400/e0f2fe/0c4a6e?text=Weekly%20Report" alt="Weekly Report" class="rounded-lg shadow-xl">
+                    </div>
+                    <div class="md:w-1/2">
+                        <h3 class="text-3xl font-bold mb-4 text-sky-700"><i class="fas fa-chart-line mr-2"></i>AIによる週次コンディションサマリー</h3>
+                        <p class="text-lg mb-4">
+                            毎週自動で、AIが過去1週間分の日報を分析。マネージャーの設定に応じて「メンバーごと」または「チーム全体」のコンディションサマリーを生成し、通知します。数値だけでは見えにくいチームの「空気感」や個人の変化を効率的に把握できます。
+                        </p>
+                        <span class="bg-sky-100 text-sky-800 px-3 py-1 rounded-full font-semibold">#状況把握</span>
+                        <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">#レポート自動化</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Proposition Section -->
+    <section class="py-16 md:py-24 bg-amber-50 text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-slate-900 mb-6">
+                日報AIツールが、お客様のマネジメントをサポートします
+            </h2>
+            <p class="text-xl text-slate-700 max-w-3xl mx-auto mb-10">
+                本ツールは、AIが日報データから「気づき」を提供し、マネージャーの「行動」をサポートする、<br class="md:hidden">実践的なマネジメントアシスタントです。
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-6 rounded-xl bg-white shadow-lg">
+                    <span class="text-5xl mb-4">🚀</span>
+                    <h3 class="text-xl font-bold mb-2">マネジメント業務の効率化</h3>
+                    <p class="text-slate-700 text-sm">日報の収集・分析・アラート通知を自動化し、マネージャーが本来注力すべき業務に集中できる環境を作ります。</p>
+                </div>
+                <div class="p-6 rounded-xl bg-white shadow-lg">
+                    <span class="text-5xl mb-4">💖</span>
+                    <h3 class="text-xl font-bold mb-2">コミュニケーションの質の向上</h3>
+                    <p class="text-slate-700 text-sm">AIによる客観的な分析が、メンバーのコンディション変化の兆候を可視化。データに基づいた的確な対話のきっかけを提供します。</p>
+                </div>
+                <div class="p-6 rounded-xl bg-white shadow-lg">
+                    <span class="text-5xl mb-4">💡</span>
+                    <h3 class="text-xl font-bold mb-2">データに基づいた状況把握</h3>
+                    <p class="text-slate-700 text-sm">AIが生成する日々の評価と週次サマリーによって、メンバーやチームの状況を定量的・定性的に把握することを支援します。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Flow Section -->
+    <section id="flow" class="py-20 px-4 bg-sky-50">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold mb-12 text-sky-800">お客様への導入は、わずか3ステップ</h2>
+            <div class="relative max-w-4xl mx-auto">
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-sky-300"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                        <div class="text-4xl font-bold text-sky-600 mb-4">STEP 1</div>
+                        <h3 class="text-xl font-bold mb-2">環境準備</h3>
+                        <p class="text-slate-700 text-sm">GoogleスプレッドシートとChatwork環境をご用意ください。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                        <div class="text-4xl font-bold text-sky-600 mb-4">STEP 2</div>
+                        <h3 class="text-xl font-bold mb-2">設定とデプロイ</h3>
+                        <p class="text-slate-700 text-sm">提供されたGASコードを貼り付け、APIキーやルームIDをスクリプトプロパティに設定します。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 border-sky-500">
+                        <div class="text-4xl font-bold text-sky-600 mb-4">STEP 3</div>
+                        <h3 class="text-xl font-bold mb-2">自動化の開始</h3>
+                        <p class="text-slate-700 text-sm">簡単なトリガー設定で、日報収集からAI分析、レポート通知までが自動化をサポートします。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 px-4 bg-white">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-center mb-12 text-sky-800">導入前の疑問にお答えします</h2>
+            <div class="space-y-6">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-xl mb-2">Q. 導入や運用に専門知識は必要ですか？</h3>
+                    <p>A. 初期設定は手順書に沿って進めるだけで完了します。日々の運用は自動化をサポートし、管理者の負担を軽減します。専門知識は不要です。</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-xl mb-2">Q. セキュリティは安全ですか？</h3>
+                    <p>A. はい。日報データや設定は全てお客様自身のGoogleアカウント（スプレッドシート、Google Drive）内に保存されます。外部のサーバーにデータを保管することは一切ないため、セキュアな環境でご利用いただけます。</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <h3 class="font-bold text-xl mb-2">Q. 料金体系を教えてください。</h3>
+                    <p>A. 本ツールはGoogle Apps Scriptで動作するため、ツール自体のライセンス費用はかかりません。ただし、利用量に応じてChatwork APIおよびGoogle Gemini APIの費用が別途発生する可能性があります。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- フッターの青帯部分を削除 -->
+
+</body>
+</html>

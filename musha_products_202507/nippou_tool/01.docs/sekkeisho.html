@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日報分析ツール 設計書</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="content">
+        <h1>日報分析ツール 設計書</h1>
+
+<h2>1. 概要</h2>
+
+<p>本ドキュメントは、「日報分析ツール」の内部設計について記述する。主にGoogle Apps Script (GAS) の各関数の役割、処理フロー、データ構造、依存関係を定義する。</p>
+
+<h2>2. 全体構成</h2>
+
+<ul>
+<li><strong>実行環境</strong>: Google Apps Script</li>
+<li><strong>主要言語</strong>: JavaScript (ECMAScript)</li>
+<li><strong>データストア</strong>: Googleスプレッドシート</li>
+<li><strong>外部API</strong>: Gemini API, Chatwork API</li>
+<li><strong>設定管理</strong>:
+<ul>
+<li><strong><code>CONFIG</code>オブジェクト</strong>: コード冒頭で定義される定数オブジェクト。シート名、キーワード、APIモデル名、ヘッダー名など、変更の可能性があるが秘匿情報ではない設定値を一元管理する。これにより、仕様変更時のメンテナンス性を向上させる。</li>
+<li><strong>スクリプトプロパティ</strong>: GASのプロジェクト設定機能。APIキーなどの秘匿情報や、環境ごとに異なる可能性がある設定を管理する。</li>
+</ul>
+</li>
+</ul>
+
+<h2>3. 関数設計</h2>
+
+<p><code>Main.gs</code>に実装されている各関数の詳細設計を以下に示す。</p>
+
+<h3>3.1. 共通関数</h3>
+
+<h4>3.1.1. 設定管理</h4>
+<h4><code>CONFIG</code> (定数オブジェクト)</h4>
+<ul>
+<li><strong>役割</strong>: アプリケーション全体で使用する設定値を一元的に管理する。ハードコーディングを避け、保守性を高めることが目的。</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th>キー</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><code>BOT_QUESTION_LOG_SHEET_NAME</code></td><td>BOTの質問履歴を記録するシート名。</td></tr>
+<tr><td><code>DAILY_REPORT_LOG_SHEET_NAME</code></td><td>全ての日報とAI評価結果を記録するシート名。</td></tr>
+<tr><td><code>CHATWORK_SETTINGS_SHEET_NAME</code></td><td>ユーザー情報を管理するシート名。</td></tr>
+<tr><td><code>MEMBER_DAILY_REPORT_LOG_HEADERS</code></td><td>メンバーごとの日報ログシートのヘッダー。</td></tr>
+<tr><td><code>WEEKLY_REPORT_FETCH_DAYS</code></td><td>週次レポート用日報ログ取得日数。</td></tr>
+<tr><td><code>REPRESENTATIVE_REPORTS_COUNT</code></td><td>日報抜粋数。</td></tr>
+<tr><td><code>REPORT_TAG</code></td><td>日報を識別するためのタグ。</td></tr>
+<tr><td><code>TRUNCATE_TEXT_MAX_LENGTH</code></td><td>テキストを短縮する際の最大長。</td></tr>
+<tr><td><code>TRUNCATE_TEXT_MAX_LENGTH_EXCERPT</code></td><td>テキストを短縮する際の抜粋最大長。</td></tr>
+<tr><td><code>DEFAULT_VALUES</code></td><td>デフォルト値の定義。</td></tr>
+<tr><td><code>ANONYMOUS_EMPLOYEE_NAME</code></td><td>匿名化された社員名。</td></tr>
+<tr><td><code>ANONYMOUS_EMPLOYEE_NAME_SHORT</code></td><td>匿名化された社員名の短縮形。</td></tr>
+<tr><td><code>CHATWORK_API_BASE_URL</code></td><td>Chatwork APIのベースURL。</td></tr>
+<tr><td><code>CHATWORK_FETCH_MESSAGE_COUNT</code></td><td>Chatworkから取得するメッセージの最大数。</td></tr>
+<tr><td><code>CHATWORK_ROLE_MANAGER</code></td><td>Chatworkのマネージャーロール。</td></tr>
+<tr><td><code>CHATWORK_ROLE_EMPLOYEE</code></td><td>Chatworkの社員ロール。</td></tr>
+<tr><td><code>CHATWORK_SETTINGS_HEADERS</code></td><td>Chatwork設定シートのヘッダー。</td></tr>
+<tr><td><code>STATUS_STRINGS</code></td><td>ステータス文字列の定義。</td></tr>
+<tr><td><code>MOOD_OPTIONS</code></td><td>気分選択肢。</td></tr>
+<tr><td><code>PROBLEM_KEYWORDS</code></td><td>問題キーワード。</td></tr>
+<tr><td><code>POSITIVE_KEYWORDS</code></td><td>ポジティブキーワード。</td></tr>
+<tr><td><code>CHATWORK_API_KEY</code></td><td>Chatwork APIキーのスクリプトプロパティキー。</td></tr>
+<tr><td><code>GEMINI_API_KEY</code></td><td>Gemini APIキーのスクリプトプロパティキー。</td></tr>
+<tr><td><code>CHATWORK_BOT_ACCOUNT_ID_KEY</code></td><td>Chatwork BOTアカウントIDのスクリプトプロパティキー。</td></tr>
+<tr><td><code>GEMINI_MODEL_NAME</code></td><td>使用するGemini APIのモデル名。</td></tr>
+<tr><td><code>TRIGGER_SETTINGS</code></td><td>定期実行トリガー設定。</td></tr>
+<tr><td><code>SCHEDULE_DEFAULTS</code></td><td>定期実行トリガーのデフォルト時刻。</td></tr>
+<tr><td><code>COMMON_PROBLEMS_MIN_COUNT</code></td><td>共通課題として認識する最小出現回数。</td></tr>
+<tr><td><code>COMMON_PROBLEMS_MAX_DISPLAY</code></td><td>共通課題の最大表示数。</td></tr>
+<tr><td><code>DEFAULT_WEEKLY_REPORT_MODE</code></td><td>週次レポートモードのデフォルト値。</td></tr>
+<tr><td><code>WEEKLY_REPORT_MODES</code></td><td>週次レポートモードの選択肢。</td></tr>
+<tr><td><code>DAILY_REPORT_LOG_COLUMN_WIDTHS</code></td><td>日報ログシートの列幅設定。</td></tr>
+<tr><td><code>DAILY_REPORT_LOG_HEADER_BG_COLOR</code></td><td>日報ログシートのヘッダー背景色。</td></tr>
+<tr><td><code>CHATWORK_REPLY_REGEX</code></td><td>Chatwork返信の正規表現。</td></tr>
+<tr><td><code>PARSE_REPORT_REGEX</code></td><td>日報解析の正規表現。</td></tr>
+<tr><td><code>DAILY_REPORT_QUESTION_MESSAGE_TEMPLATE</code></td><td>日報質問メッセージテンプレート。</td></tr>
+<tr><td><code>DAILY_REPORT_ASSESS_PROMPT_TEMPLATE</code></td><td>日報評価プロンプトテンプレート。</td></tr>
+<tr><td><code>DAILY_REPORT_ALERT_SUBJECT_TEMPLATE</code></td><td>日報アラート件名テンプレート。</td></tr>
+<tr><td><code>DAILY_REPORT_ALERT_BODY_TEMPLATE</code></td><td>日報アラート本文テンプレート。</td></tr>
+<tr><td><code>WEEKLY_REPORT_PROMPT_TEMPLATE</code></td><td>週次レポートプロンプトテンプレート。</td></tr>
+<tr><td><code>INDIVIDUAL_REPORT_SUBJECT_TEMPLATE</code></td><td>個別レポート件名テンプレート。</td></tr>
+<tr><td><code>INDIVIDUAL_REPORT_BODY_TEMPLATE</code></td><td>個別レポート本文テンプレート。</td></tr>
+<tr><td><code>TEAM_SUMMARY_SUBJECT_TEMPLATE</code></td><td>チームサマリー件名テンプレート。</td></tr>
+<tr><td><code>TEAM_SUMMARY_BODY_TEMPLATE</code></td><td>チームサマリー本文テンプレート。</td></tr>
+</tbody>
+</table>
+
+<h4>3.1.2. トリガー・UI関連</h4>
+
+<ul>
+<li><strong><code>onOpen()</code></strong>
+<ul>
+<li><strong>役割</strong>: スプレッドシートを開いた際に、カスタムメニュー <code>日報AIツール</code> をUI上に追加する。以下のメニュー項目が含まれる:
+    <ul>
+    <li>日報質問送信（Chatwork）</li>
+    <li>Chatwork日報取得・分析</li>
+    <li>週次レポート生成</li>
+    <li>定期実行トリガーを設定</li>
+    <li>全てのトリガーを削除</li>
+    </ul>
+</li>
+</ul>
+</li>
+<li><strong><code>getScheduledTimes()</code></strong>
+<ul>
+<li><strong>役割</strong>: スクリプトプロパティから定期実行の時刻設定を読み込む。プロパティが存在しない場合は<code>CONFIG.SCHEDULE_DEFAULTS</code>のデフォルト値を使用する。</li>
+</ul>
+</li>
+<li><strong><code>createDailyTriggers()</code></strong>
+<ul>
+<li><strong>役割</strong>: 既存のトリガーを全て削除した後、`sendDailyReportQuestions`, `processChatworkReplies`, `cleanUpBotQuestionLog`, `generateWeeklyReports`の4つの関数に対して、時間ベースのトリガーを新規に設定する。
+注: Apps Scriptの時限トリガーは、指定時刻の前後15分程度の範囲で実行される可能性があり、厳密な時刻の実行は保証されない（Googleのサーバー負荷による）。</li>
+</ul>
+</li>
+<li><strong>`deleteTriggers()`</strong>
+<ul>
+<li><strong>役割</strong>: 現在のプロジェクトに設定されている全てのトリガーを削除する。</li>
+</ul>
+</li>
+</ul>
+
+<h4>3.1.3. ログ管理関連</h4>
+
+<ul>
+<li><strong><code>cleanUpBotQuestionLog()</code></strong>
+<ul>
+<li><strong>役割</strong>: <code>BOT質問ログ</code>シートの古いログを削除する。7日以上経過した「未返信」「エラー」ログと、正常に処理が完了した「返信済み_処理成功」ログを削除対象とする。</li>
+</ul>
+</li>
+<li><strong><code>logQuestionMessageId(...)</code></strong>
+<ul>
+<li><strong>役割</strong>: Chatworkに送信した質問メッセージの情報を<code>BOT質問ログ</code>シートに追記する。</li>
+</ul>
+</li>
+<li><strong><code>getPendingQuestionMessages()</code></strong>
+<ul>
+<li><strong>役割</strong>: <code>BOT質問ログ</code>シートから全てのログを読み込み、処理しやすいオブジェクトの配列に変換して返す。</li>
+</ul>
+</li>
+<li><strong><code>updateQuestionStatus(...)</code></strong>
+<ul>
+<li><strong>役割</strong>: <code>BOT質問ログ</code>シート内の特定のメッセージIDのステータス（とエラー詳細）を更新する。</li>
+</ul>
+</li>
+<li><strong><code>logReportToSheet(...)</code></strong>
+<ul>
+<li><strong>役割</strong>: 解析・評価が完了した日報データを<code>日報ログ</code>シートに追記する。また、メンバーごとの個別日報ログシートを作成し、そこに日報データを記録する。</li>
+</ul>
+</li>
+</ul>
+
+<h4>3.1.4. Chatwork連携</h4>
+
+<ul>
+<li><strong><code>getChatworkApiKey()</code></strong>: スクリプトプロパティからChatwork APIキーを取得する。</li>
+<li><strong><code>getChatworkTargetRoomIds()</code></strong>
+<ul>
+<li><strong>役割</strong>: <code>Chatwork設定</code>シートを読み込み、マネージャーと社員の情報を紐付けた、フラットな社員情報リストを生成する。</li>
+<li><strong>処理フロー</strong>:
+<ol>
+<li>シートから全データを取得。</li>
+<li>データをループし、役割が`manager`のユーザーと`employee`のユーザーをそれぞれ別の配列に格納。</li>
+<li>`employee`のリストをループし、`グループ名`をキーにして対応する`manager`情報を紐付ける。</li>
+<li>最終的な `{employeeName, employeeRoomId, managerName, managerRoomId, weeklyReportMode, group, role}` の配列を返す。`weeklyReportMode`はマネージャーの設定が引き継がれる。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><strong><code>getBotChatworkAccountId()</code></strong>: Chatwork APIの<code>/me</code>エンドポイントを叩き、BOT自身のChatworkアカウントIDを取得する。取得したIDはスクリプトプロパティにキャッシュする。</li>
+<li><strong><code>sendChatworkNotification(...)</code></strong>: Chatwork APIを呼び出し、指定されたルームにメッセージを送信する汎用関数。</li>
+</ul>
+
+<h4>3.1.5. Gemini API関連</h4>
+
+<ul>
+<li><strong><code>getGeminiApiKey()</code></strong>: スクリプトプロパティからGemini APIキーを取得する。</li>
+<li><strong><code>callGeminiApi(prompt)</code></strong>: Gemini APIの<code>generateContent</code>エンドポイントに対し、指定されたプロンプトを送信し、応答テキストを返す。</li>
+</ul>
+
+<hr style="border-top: 2px solid #e0e0e0; margin: 50px 0;">
+
+<h3>3.2. 主要機能</h3>
+<p>各主要機能は、日報の収集からマネジメントへの洞察提供までの一連のプロセスとして動作します。<br>以下に、各機能の処理フローを詳細に記述します。</p>
+
+<h4>3.2.1. 日報質問の送信プロセス</h4>
+<ul>
+<li><strong>プロセス開始</strong>: 毎日、設定された時刻に日報質問が自動送信される。</li>
+<ol>
+<li><strong>日報質問の送信 (<code>sendDailyReportQuestions()</code>)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: `getChatworkTargetRoomIds()` を呼び出し、Chatwork設定シートから全社員情報を取得します。<br>取得した社員情報リストから、未処理の日報がない社員を特定します。<br>対象社員のChatworkルームに日報提出メッセージを送信します (内部で<code>sendChatworkNotification()</code>を呼び出し、メッセージIDを返します)。</li>
+    <li><strong>出力</strong>: 送信したメッセージIDを`logQuestionMessageId()`でBOT質問ログに記録します。</li>
+    </ul>
+</li>
+<li><strong>プロセス終了</strong>: 日報質問の送信が完了する。</li>
+</ol>
+</ul>
+
+<h4>3.2.2. 日報返信の収集・分析プロセス</h4>
+<ul>
+<li><strong>プロセス開始</strong>: 日報質問送信後、設定された時刻に自動実行される。</li>
+<ol>
+<li><strong>日報返信の収集と解析 (<code>processChatworkReplies()</code>)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: 日報質問送信後、設定された時刻に自動実行されます。<br>`getChatworkTargetRoomIds()` を呼び出し、Chatwork設定シートから全社員情報を取得します。<br>`getPendingQuestionMessages()` を呼び出し、BOT質問ログから未処理の質問を特定します。<br>対象社員のChatworkルームからメッセージを取得します (内部で<code>getChatworkMessages()</code>を呼び出し、Chatworkメッセージの配列を返します)。<br>メッセージがBOTの質問への返信であり、かつ`#日報`タグが含まれているかを確認します。</li>
+    <li><strong>出力</strong>: 該当するChatworkメッセージ。</li>
+    </ul>
+</li>
+<li><strong>日報データの抽出とバリデーション (<code>parseReportFromMessage()</code>, <code>validateDailyReport()</code>)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: 該当メッセージから`parseReportFromMessage()` で「業務内容」「気分」「困っていること」を抽出します (日報データオブジェクトを返します)。<br>抽出した日報データを`validateDailyReport()` で検証します (バリデーション結果オブジェクトを返します)。</li>
+    <li><strong>出力</strong>: 日報データオブジェクト、バリデーション結果オブジェクト。</li>
+    <li><strong>分岐</strong>:
+        <ul>
+        <li><strong>バリデーション成功の場合</strong>: 次のステップへ進みます。</li>
+        <li><strong>バリデーション失敗の場合</strong>: `updateQuestionStatus()` でBOT質問ログのステータスを`返信済み_フォーマット不正`に更新し、この日報の処理をスキップします。</li>
+        </ul>
+    </li>
+    </ul>
+</li>
+<li><strong>日報の評価と通知 (<code>assessAndNotify()</code>)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: バリデーションが成功した場合、日報データをGemini APIで評価し、AI評価状態と理由を取得します (内部で<code>callGeminiApi()</code>を呼び出し、Gemini応答を返します)。<br>AI評価が「危険」「少し悪い」「悪い」の場合、担当マネージャーにChatworkで通知します (内部で<code>sendChatworkNotification()</code>を呼び出し)。</li>
+    <li><strong>出力</strong>: AI評価状態、AI評価理由、Chatwork通知（条件による）。</li>
+    <li><strong>Gemini API プロンプト内容</strong>:
+        <ul>
+        <li><strong>目的</strong>: 日報の内容を評価し、AI評価状態（例: 良い、普通、悪い）と評価理由を生成する。</li>
+        <li><strong>主要な入力情報</strong>: ユーザーの日報本文（業務内容、気分、困っていること）。</li>
+        <li><strong>プロンプト例</strong>:
+<pre><code>以下の日報の内容を分析し、提出者の現在の心理状態や業務の調子について、**4段階（良い、普通、少し悪い、悪い）で評価してください。ただし、特に「今日の気分」が悪い場合や、「困っていること」にネガティブな兆候が見られる場合は、評価を「危険」としてください。**
+氏名は匿名化し、「提出者」として言及してください。
+
+業務内容：{workContent}
+気分：{mood}
+困っていること：{problems}
+
+結果はJSON形式で返してください。例: { "status": "危険", "reason": "具体例：今日の気分が悪いと申告しており、困っている内容にXXとあるため。" }</code></pre>
+        </li>
+        <li><strong>Gemini API レスポンス内容</strong>:
+            <ul>
+            <li><strong>形式</strong>: JSONオブジェクト</li>
+            <li><strong>内容</strong>:
+<pre><code>{
+  "status": "[AI評価状態: 危険, 少し悪い, 悪い, 普通, 良い]",
+  "reason": "[AI評価理由]"
+}</code></pre>
+            <p>Gemini APIからのレスポンスはJSON形式であり、日報の評価結果と理由が含まれます。<code>status</code>フィールドはAIによる日報の評価状態（危険、少し悪い、悪い、普通、良い）を示し、<code>reason</code>フィールドはその評価に至った具体的な理由を記述します。</p>
+            </li>
+            </ul>
+        </li>
+        </ul>
+    </li>
+    </ul>
+</li>
+<li><strong>日報ログの記録とステータス更新 (<code>logReportToSheet()</code>, `updateQuestionStatus()`)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: 解析・評価済みの日報データを`logReportToSheet()`で「日報ログ」シートに記録します。<br>`updateQuestionStatus()` でBOT質問ログシートの該当メッセージのステータスを`返信済み_処理成功`または`エラー発生`に更新します。</li>
+    <li><strong>出力</strong>: 「日報ログ」シートへの記録、BOT質問ログシートのステータス更新。</li>
+    </ul>
+</li>
+<li><strong>プロセス終了</strong>: 日報データの収集、分析、記録、および必要に応じた通知が完了する。</li>
+</ol>
+</ul>
+
+
+
+<h4>3.2.3. 週次レポート生成プロセス</h4>
+<ul>
+<li><strong>プロセス開始</strong>: 毎週月曜日、設定された時刻に<code>generateWeeklyReports()</code>が自動実行される。</li>
+<ol>
+<li><strong>全社員情報の取得とグループ化 (<code>getChatworkTargetRoomIds()</code>)</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: `getChatworkTargetRoomIds()` を呼び出し、Chatwork設定シートから全社員の情報を取得し、マネージャーごとに担当社員をグループ化します。</li>
+    <li><strong>出力</strong>: マネージャーごとの社員情報グループ。</li>
+    </ul>
+</li>
+<li><strong>グループごとのレポートモード判定</strong>:
+    <ul>
+    <li><strong>処理内容</strong>: 各マネージャーグループの<code>週次レポートモード</code>（`individual`または`team`）を判定します。</li>
+    <li><strong>出力</strong>: レポートモード（`individual`または`team`）。</li>
+    </ul>
+</li>
+<li><strong>レポート生成（モード分岐）</strong>:
+    <ul>
+    <li><strong>個人別モードの場合</strong>:
+        <ul>
+        <li><strong>処理内容</strong>: `getWeeklyRawReports()` で各担当社員の過去1週間分の日報データを取得します (日報データオブジェクトの配列を返します)。<br>`generateIndividualReportWithGemini()` で個別のコンディションサマリーを生成します (レポートテキストと件名を返します)。<br>これらのサマリーを結合し、担当マネージャーにまとめて通知します (内部で<code>sendChatworkNotification()</code>を呼び出し)。</li>
+        <li><strong>出力</strong>: Chatwork通知。</li>
+        <li><strong>Gemini API プロンプト内容</strong>:
+            <ul>
+            <li><strong>目的</strong>: 個別の週次コンディションサマリーを生成する。</li>
+            <li><strong>主要な入力情報</strong>: 担当社員の過去1週間分の日報データ。</li>
+            <li><strong>プロンプト例</strong>:
+<pre><code>以下の{subjectName}の過去1週間分のデータから、この{reportType}のコンディションの傾向、主な課題、ポジティブな動きについて分析し、簡潔なサマリーレポートを生成してください。
+マネージャーが週ごとの傾向を**一目で把握できるよう、以下のフォーマットに厳密に従って**記述してください。
+
+**過去1週間分の{subjectName}のデータ：**
+{dataSummary}
+
+▼ 今週の{subjectName}コンディションサマリー
+ここにレポート本文を記述。物語形式で、メンバーまたはチームの「空気感」を伝えるように記述してください。全体で最大250文字程度に収めてください。
+以下の要素を盛り込むことを推奨します。
+- 全体的な傾向や雰囲気
+- 特に注目すべきポジティブな点（具体的な業務内容や成果に触れる）
+- 潜在的な課題や懸念点（背景や影響にも触れる）
+- 変化の兆候や、今後注目すべき点
+</code></pre>
+        </li>
+        <li><strong>Gemini API レスポンス内容</strong>:
+            <ul>
+            <li><strong>形式</strong>: テキスト形式</li>
+            <li><strong>内容</strong>:
+<pre><code>▼ 今週の{subjectName}コンディションサマリー
+[レポート本文]</code></pre>
+            <p>Gemini APIからのレスポンスはテキスト形式であり、指定されたフォーマットに従った週次コンディションサマリーが含まれます。</p>
+            </li>
+            </ul>
+        </li>
+        </ul>
+    </li>
+    <li><strong>チーム全体モードの場合</strong>:
+        <ul>
+        <li><strong>処理内容</strong>: `getWeeklyTeamReportSummaryForGroup()` で担当社員全員の過去1週間分の日報データを集計します (集計データオブジェクトを返します)。<br>`generateTeamSummaryReportWithGemini()` でチーム全体のコンディションサマリーを生成します (サマリーレポートテキストを返します)。<br>このサマリーを、担当マネージャーに通知します (内部で<code>sendChatworkNotification()</code>を呼び出し)。</li>
+        <li><strong>出力</strong>: Chatwork通知。</li>
+        <li><strong>Gemini API プロンプト内容</strong>:
+            <ul>
+            <li><strong>目的</strong>: チーム全体の週次コンディションサマリーを生成する。</li>
+            <li><strong>主要な入力情報</strong>: 担当社員全員の過去1週間分の日報集計データ。</li>
+            <li><strong>プロンプト例</strong>:
+<pre><code>以下の{subjectName}の過去1週間分のデータから、この{reportType}のコンディションの傾向、主な課題、ポジティブな動きについて分析し、簡潔なサマリーレポートを生成してください。
+マネージャーが週ごとの傾向を**一目で把握できるよう、以下のフォーマットに厳密に従って**記述してください。
+
+**過去1週間分の{subjectName}のデータ：**
+{dataSummary}
+
+▼ 今週の{subjectName}コンディションサマリー
+ここにレポート本文を記述。物語形式で、メンバーまたはチームの「空気感」を伝えるように記述してください。全体で最大250文字程度に収めてください。
+以下の要素を盛り込むことを推奨します。
+- 全体的な傾向や雰囲気
+- 特に注目すべきポジティブな点（具体的な業務内容や成果に触れる）
+- 潜在的な課題や懸念点（背景や影響にも触れる）
+- 変化の兆候や、今後注目すべき点
+</code></pre>
+        </li>
+        <li><strong>Gemini API レスポンス内容</strong>:
+            <ul>
+            <li><strong>形式</strong>: テキスト形式</li>
+            <li><strong>内容</strong>:
+<pre><code>▼ 今週の{subjectName}コンディションサマリー
+[レポート本文]</code></pre>
+            <p>Gemini APIからのレスポンスはテキスト形式であり、指定されたフォーマットに従った週次コンディションサマリーが含まれます。</p>
+            </li>
+            </ul>
+        </li>
+        </ul>
+    </li>
+    </ul>
+</li>
+</ol>
+<li><strong>プロセス終了</strong>: 週次レポートが生成され、マネージャーに通知される。</li>
+</ul>
+<hr>
+<p>最終更新日: 2025/07/29</p>

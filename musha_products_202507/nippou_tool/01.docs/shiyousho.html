@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日報分析ツール 仕様書</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="content">
+        <h1>日報分析ツール 仕様書</h1>
+
+<h2>1. 概要</h2>
+
+<p>本ツールは、Google Apps Script (GAS) を用いて、Chatwork経由での日報収集、Gemini APIによる内容分析、分析結果に基づいたアラート通知、および全データのスプレッドシートへのログ記録を自動化するシステムである。</p>
+
+<h2>2. 機能要件</h2>
+
+<h3>2.1. ユーザー・ルーム管理機能</h3>
+
+<ul>
+<li><strong>要件</strong>: 日報提出の対象となる社員（employee）と、その報告先となる管理者（manager）の情報を、グループ単位で管理できること。</li>
+<li><strong>仕様</strong>:
+<ul>
+<li>Googleスプレッドシートの<code>Chatwork設定</code>シートにて、ユーザー情報を管理する。</li>
+<li><code>グループ名</code>列でマネージャーと社員の紐付けを行う。</li>
+<li><code>役割</code>列に <code>manager</code> または <code>employee</code> を指定することで、役割を定義する。</li>
+</ul>
+</li>
+</ul>
+
+<h3>2.2. 日報質問の送信</h3>
+
+<ul>
+<li><strong>要件</strong>: 定期的に全社員へ日報提出を促すメッセージを送信できること。</li>
+<li><strong>仕様</strong>:
+<ul>
+<li><strong>トリガー</strong>: 日次（時刻はスクリプトプロパティで設定可能）の自動トリガー、またはスプレッドシートのカスタムメニューからの手動実行。</li>
+Apps Scriptの時限トリガーは、設定時刻の前後15分程度の範囲内で実行される可能性があり、正確な時刻の実行は保証されません（Googleのサーバー負荷による仕様）。</li>
+<li><strong>処理</strong>:
+<ol>
+<li><code>Chatwork設定</code>シートに登録されている<code>employee</code>ロールの全ユーザーを対象とする。</li>
+<li><code>BOT質問ログ</code>シートを参照し、対象者に未処理（未返信、エラー等）の日報要求がないか確認する。</li>
+<li>未処理の日報がない場合のみ、日報提出を促す定型メッセージを対象者のChatworkルームに送信する。</li>
+<li>送信したメッセージのID、時刻、ステータス（初期値: <code>未返信</code>）を<code>BOT質問ログ</code>シートに記録する。</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+
+<h3>2.3. 日報返信の収集・分析</h3>
+
+<ul>
+<li><strong>要件</strong>: 社員から提出された日報を解析し、内容に応じてマネージャーへ通知できること。</li>
+<li><strong>仕様</strong>:
+<ul>
+<li><strong>トリガー</strong>: 日次（時刻はスクリプトプロパティで設定可能）の自動トリガー、またはスプレッドシートのカスタムメニューからの手動実行。</li>
+<li><strong>処理</strong>:
+<ol>
+<li><code>BOT質問ログ</code>シートから、ステータスが<code>返信済み_処理成功</code>以外の質問を取得する。</li>
+<li>対象のChatworkルームから最新50件のメッセージを取得する。この件数は固定値であり、変更はできません。</li>
+<li>BOTが送信した質問への返信（リプライ）形式のメッセージを特定する。</li>
+<li>メッセージ本文に<code>#日報</code>タグが含まれていることを確認する。</li>
+<li>メッセージ本文から「業務内容」「気分」「困っていること」を正規表現で抽出する。</li>
+<li><strong>バリデーション</strong>:
+<ul>
+<li>業務内容が空でないこと。</li>
+<li>気分が設定された選択肢のいずれかであること。</li>
+<li>バリデーション失敗時は、<code>BOT質問ログ</code>のステータスを<code>返信済み_フォーマット不正</code>とし、処理をスキップする。</li>
+</ul>
+</li>
+<li><strong>AI分析</strong>:
+<ul>
+<li>バリデーション成功後、日報データを埋め込んだプロンプトを生成し、Gemini APIに送信する。</li>
+<li>APIから提出者の心理状態を4段階（良い、普通、少し悪い、悪い）＋危険で評価したJSON形式の応答を取得する。</li>
+</ul>
+</li>
+<li><strong>アラート通知</strong>:
+<ul>
+<li>AIの評価が<code>危険</code>、<code>少し悪い</code>、<code>悪い</code>のいずれかの場合、担当マネージャーのChatworkルームにアラートメッセージを送信する。</li>
+</ul>
+</li>
+<li><strong>ログ記録</strong>:
+<ul>
+<li>分析された全ての日報データ、AIの評価結果、担当マネージャー名を<code>日報ログ</code>シートに記録する。また、メンバーごとの個別日報ログシートを作成し、そこに日報データを記録する。</li>
+<li><code>BOT質問ログ</code>のステータスを<code>返信済み_処理成功</code>または<code>エラー発生</code>に更新する。</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+
+
+
+<h3>2.5. 週次レポート生成機能</h3>
+
+<ul>
+<li><strong>要件</strong>: マネージャーごとに設定されたレポートモード（個人別／チーム全体）に基づき、週次レポートを生成して自動通知できること。</li>
+<li><strong>仕様</strong>:
+<ul>
+<li><strong>トリガー</strong>: 週次（毎週月曜日 10:00 AM）の自動トリガー、またはスプレッドシートのカスタムメニューからの手動実行。</li>
+<li><strong>処理</strong>:
+<ul>
+<li>システムは、Chatwork設定シートからマネージャーと社員の情報を取得し、マネージャーごとに担当社員をグループ化します。</li>
+<li>各マネージャーに設定された週次レポートモード（個人別またはチーム全体）に基づき、以下の処理を行います。
+<ul>
+<li><strong>個人別モードの場合</strong>: 各担当社員の過去1週間分の日報データを収集し、個別のコンディションサマリーを生成します。これらのサマリーを結合し、担当マネージャーに通知します。</li>
+<li><strong>チーム全体モードの場合</strong>: 担当社員全員の過去1週間分の日報データを集計し、チーム全体のコンディションサマリーを生成します。このサマリーを、担当マネージャーに通知します。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<h2>3. データ仕様</h2>
+
+<h3>3.1. <code>Chatwork設定</code>シート</h3>
+
+<table><thead><tr><th>列</th><th>ヘッダー名</th><th>説明</th><th>データ型</th></tr></thead><tbody><tr><td>A</td><td>グループ名</td><td>マネージャーと社員を紐付けるための任意のグループ名</td><td>String</td></tr><tr><td>B</td><td>氏名</td><td>ユーザーの氏名</td><td>String</td></tr><tr><td>C</td><td>ルームID</td><td>ChatworkのルームID</td><td>String</td></tr><tr><td>D</td><td>役割</td><td><code>manager</code> または <code>employee</code></td><td>String</td></tr><tr><td>E</td><td>週次レポートモード</td><td><code>manager</code>の行に設定。<code>team</code>または<code>individual</code>。空欄の場合は<code>individual</code>として動作する。</td><td>String</td></tr></tbody></table>
+
+<h3>3.2. <code>日報ログ</code>シート</h3>
+
+<table><thead><tr><th>列</th><th>ヘッダー名</th><th>説明</th><th>データ型</th></tr></thead><tbody><tr><td>A</td><td>タイムスタンプ</td><td>ログが記録された日時</td><td>Datetime</td></tr><tr><td>B</td><td>氏名</td><td>日報提出者の氏名</td><td>String</td></tr><tr><td>C</td><td>マネージャー名</td><td>担当マネージャーの氏名</td><td>String</td></tr><tr><td>D</td><td>日報日付</td><td>日報の対象日</td><td>Datetime</td></tr><tr><td>E</td><td>今日の業務内容</td><td>日報から抽出した業務内容</td><td>String</td></tr><tr><td>F</td><td>今日の気分</td><td>日報から抽出した気分</td><td>String</td></tr><tr><td>G</td><td>困っていること</td><td>日報から抽出した困っていること</td><td>String</td></tr><tr><td>H</td><td>AI評価状態</td><td>Gemini APIによる4段階評価（＋危険）の結果</td><td>String</td></tr><tr><td>I</td><td>AI評価理由</td><td>上記評価の根拠</td><td>String</td></tr></tbody></table>
+
+<h3>3.3. <code>BOT質問ログ</code>シート</h3>
+
+<table><thead><tr><th>列</th><th>ヘッダー名</th><th>説明</th><th>データ型</th></tr></thead><tbody><tr><td>A</td><td>ルームID</td><td>質問を送信したChatworkのルームID</td><td>String</td></tr><tr><td>B</td><td>質問ID</td><td>送信した質問メッセージのID</td><td>String</td></tr><tr><td>C</td><td>送信日時</td><td>質問を送信した日時</td><td>Datetime</td></tr><tr><td>D</td><td>ステータス</td><td><code>未返信</code>, <code>返信済み_処理成功</code>, <code>返信済み_フォーマット不正</code>, <code>エラー発生_...</code>など</td><td>String</td></tr><tr><td>E</td><td>エラー詳細</td><td>エラー発生時の詳細情報</td><td>String</td></tr></tbody></table>
+
+<h3>3.4. メンバー別日報ログシート</h3>
+
+<p>シート名は<code>【日報ログ】メンバー名</code>の形式で、日報が初めて記録される際に自動的に作成されます。</p>
+
+<table><thead><tr><th>列</th><th>ヘッダー名</th><th>説明</th><th>データ型</th></tr></thead><tbody><tr><td>A</td><td>タイムスタンプ</td><td>ログが記録された日時</td><td>Datetime</td></tr><tr><td>B</td><td>日報日付</td><td>日報の対象日</td><td>Datetime</td></tr><tr><td>C</td><td>今日の業務内容</td><td>日報から抽出した業務内容</td><td>String</td></tr><tr><td>D</td><td>今日の気分</td><td>日報から抽出した気分</td><td>String</td></tr><tr><td>E</td><td>困っていること</td><td>日報から抽出した困っていること</td><td>String</td></tr></tbody></table>
+
+<h2>4. 外部連携API</h2>
+
+<ul>
+<li><strong>Chatwork API (v2)</strong>
+<ul>
+<li><code>/me</code>: BOT自身のアカウントID取得に使用。</li>
+<li><code>/rooms/{roomId}/messages</code>: メッセージの取得と送信に使用。</li>
+</ul>
+</li>
+<li><strong>Google Gemini API (v1beta)</strong>
+<ul>
+<li><code>/models/gemini-2.0-flash:generateContent</code>: 日報分析のコアロジックで使用。</li>
+</ul>
+</li>
+</ul>
+
+<hr>
+<p>最終更新日: 2025/07/29</p>
+    </div>
+</body>
+</html>

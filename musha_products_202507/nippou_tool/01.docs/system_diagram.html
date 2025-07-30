@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>システム相関図</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General flowchart styling */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px; /* Space between main steps */
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .flow-step, .flow-decision {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .node {
+            background-color: #e3f2fd; /* Light blue for general process */
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 250px;
+            font-weight: bold;
+            color: #333;
+            position: relative; /* For arrows */
+        }
+
+        .node.actor {
+            background-color: #ffe0b2; /* Light orange for actors */
+            border-color: #ff9800;
+        }
+
+        .node.data-store {
+            background-color: #c8e6c9; /* Light green for data stores */
+            border-color: #4caf50;
+        }
+
+        .node.api-call {
+            background-color: #ffccbc; /* Light red for API calls */
+            border-color: #ff5722;
+        }
+
+        .node.process {
+            background-color: #e1f5fe; /* Another light blue for processes */
+            border-color: #03a9f4;
+        }
+
+        .node.decision {
+            background-color: #fff9c4; /* Light yellow for decisions */
+            border-color: #ffeb3b;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .description {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .sub-step .node {
+            min-width: 200px;
+            font-size: 0.9em;
+            padding: 8px 15px;
+        }
+
+        /* Connectors (arrows) */
+        .flow-connector {
+            width: 2px;
+            height: 30px;
+            background-color: #333;
+            position: relative;
+        }
+        .flow-connector::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #333;
+        }
+
+        .flow-decision .decision-branches {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .flow-decision .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .flow-decision .branch-ng { border-color: #dc3545; }
+        .flow-decision .branch-ok { border-color: #28a745; }
+
+        .flow-connector.horizontal {
+            width: 50px; /* Length of horizontal arrow */
+            height: 2px;
+            background-color: #333;
+            position: relative;
+            margin: 0 10px;
+        }
+        .flow-connector.horizontal::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -4px;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #333;
+        }
+
+        /* Merging connector for decision branches */
+        .merge-connector {
+            width: 2px;
+            height: 50px; /* Height to connect branches */
+            background-color: #333;
+            position: relative;
+            margin-top: 20px;
+        }
+        .merge-connector::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -20px; /* Adjust to connect to left branch */
+            width: 40px; /* Width to span branches */
+            height: 2px;
+            background-color: #333;
+        }
+        .merge-connector::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>システム相関図</h1>
+        <p>本ドキュメントは、「日報分析ツール」の主要な機能が、どのような順序で処理されていくかを図で示します。</p>
+
+        <h2>図形の色について</h2>
+        <ul>
+            <li><span style="background-color: #e3f2fd; padding: 2px 5px; border: 1px solid #2196f3; border-radius: 3px;">薄い青</span>: 一般的な処理、またはプロセスを表します。</li>
+            <li><span style="background-color: #ffe0b2; padding: 2px 5px; border: 1px solid #ff9800; border-radius: 3px;">薄いオレンジ</span>: システムの外部にいる「アクター」（例: 社員、マネージャー）を表します。</li>
+            <li><span style="background-color: #c8e6c9; padding: 2px 5px; border: 1px solid #4caf50; border-radius: 3px;">薄い緑</span>: データの保存場所（例: スプレッドシート、Google Drive）を表します。</li>
+            <li><span style="background-color: #ffccbc; padding: 2px 5px; border: 1px solid #ff5722; border-radius: 3px;">薄い赤</span>: 外部APIへの呼び出し（例: Chatwork API, Gemini API）を表します。</li>
+            <li><span style="background-color: #fff9c4; padding: 2px 5px; border: 1px solid #ffeb3b; border-radius: 3px;">薄い黄色</span>: 意思決定ポイントや条件分岐を表します。</li>
+        </ul>
+
+        <h2>1. 日報の収集・分析サイクル（日次自動実行）</h2>
+
+        <h3>1.1. 日報質問の送信</h3>
+        <div class="flowchart">
+            <div class="flow-step">
+                <div class="node">時間トリガー (設定可能)</div>
+                <div class="description">(A) sendDailyReportQuestions 実行</div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node data-store">(B) Chatwork設定シート 読込 (Spreadsheet)</div>
+                    </div>
+                    <div class="sub-step">
+                        <div class="node api-call">(C) 日報提出を依頼 (Chatwork API)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node actor">社員 (Employee)</div>
+                <div class="description">(D) 日報を返信する</div>
+            </div>
+        </div>
+
+        <h3>1.2. 日報返信の収集・分析</h3>
+        <div class="flowchart">
+            <div class="flow-step">
+                <div class="node">時間トリガー (設定可能)</div>
+                <div class="description">(E) processChatworkReplies 実行</div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node api-call">(F) 日報の返信を取得 (Chatwork API)</div>
+                    </div>
+                    <div class="sub-step">
+                        <div class="node process">(G) 日報を解析・検証</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-decision">
+                <div class="node decision">検証結果</div>
+                <div class="decision-branches">
+                    <div class="branch branch-ng">
+                        <div class="node data-store">(H) 検証NG</div>
+                        <div class="flow-connector"></div>
+                        <div class="node data-store">(I) Google Spreadsheet (BOT質問ログ)<br>フォーマットエラーを記録</div>
+                    </div>
+                    <div class="branch branch-ok">
+                        <div class="node process">(J) 検証OK</div>
+                        <div class="flow-connector"></div>
+                        <div class="node api-call">(K) Gemini API<br>日報内容を分析</div>
+                    </div>
+                </div>
+            </div>
+            <div class="merge-connector"></div> <!-- Connector to merge branches -->
+
+            <div class="flow-step">
+                <div class="node api-call">(L) 分析結果 (from Gemini API)</div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node data-store">(M) 日報と分析結果をログに記録 (Spreadsheet)</div>
+                    </div>
+                    <div class="sub-step">
+                        <div class="node api-call">(N) AI評価が「悪い」場合、アラート通知 (Chatwork API)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node actor">マネージャー (Manager)</div>
+            </div>
+        </div>
+
+        
+        <h2>2. 週次レポート生成（週次自動実行）</h2>
+        <div class="flowchart">
+            <div class="flow-step">
+                <div class="node">時間トリガー (毎週月曜 10:00 AM)</div>
+                <div class="description">(A) generateWeeklyReports 実行</div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node data-store">(B) Chatwork設定シート 読込 (Spreadsheet)</div>
+                    </div>
+                    <div class="sub-step">
+                        <div class="node data-store">(C) 日報ログシート 読込 (Spreadsheet)</div>
+                    </div>
+                    <div class="sub-step">
+                        <div class="node process">(D) マネージャー毎に処理を分岐</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node process">(E) 過去1週間分の日報データを取得・集計</div>
+                        <div class="description">（レポートモードに応じて個人・チーム単位で処理）</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="node api-call">Gemini API</div>
+                <div class="description">(F) 週次コンディションサマリーを生成</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="node api-call">(G) 生成されたサマリー</div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="node">Google Apps Script</div>
+                <div class="details">
+                    <div class="sub-step">
+                        <div class="node api-call">(H) 整形してマネージャーに通知 (Chatwork API)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-connector"></div>
+            <div class="flow-step">
+                <div class="node actor">マネージャー (Manager)</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
