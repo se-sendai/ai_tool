@@ -205,9 +205,12 @@ class UiStateManager:
         print("DEBUG: UiStateManager.set_idle_state called.")
         selected_mode = self.app.mode_variable.get() # Appインスタンスから現在のモードを取得
 
-        if selected_mode == "qa":
+        if selected_mode == self.app.AnalysisMode.QA:
             # AI対話モードの場合、AI対話関連UIと削除関連UIを活性化
-            self.set_qa_active_state()
+            if self.app.in_qa_session:
+                self.set_qa_active_state()
+            else:
+                self.set_mode_qa_initial_state()
         else:
             # 通常モードの場合、ファイル/フォルダ選択関連UIとモード選択ラジオボタンを活性化
             self.set_mode_normal_state()
