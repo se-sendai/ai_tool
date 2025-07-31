@@ -22,6 +22,16 @@ class App(customtkinter.CTk):
         self.title("Interview Analyzer")
         self.geometry("800x600")
 
+        self.create_widgets()
+
+        # DB初期化
+        logging.debug("About to import database_handler.")
+        import database_handler
+        logging.debug("Calling database_handler.initialize_database()...")
+        database_handler.initialize_database()
+        logging.debug("database_handler.initialize_database() finished.")
+
+    def create_widgets(self):
         # --- レイアウト設定 ---
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(4, weight=1) # ログエリアの行を拡張可能に
@@ -133,14 +143,21 @@ class App(customtkinter.CTk):
         self.ui_manager = UiStateManager(self)
 
         # 初期UI設定
-        self.on_mode_change() 
+        self.on_mode_change()
 
-        # DB初期化
-        logging.debug("About to import database_handler.")
-        import database_handler
-        logging.debug("Calling database_handler.initialize_database()...")
-        database_handler.initialize_database()
-        logging.debug("database_handler.initialize_database() finished.")
+        # UIリロード機能
+        self.reload_button = customtkinter.CTkButton(self, text="UIリロード (F5)", command=self.reload_ui)
+        self.reload_button.grid(row=7, column=0, padx=20, pady=10, sticky="ew")
+        self.bind("<F5>", lambda event: self.reload_ui())
+
+    def reload_ui(self):
+        self.log("UIをリロードします...")
+        # すべての子ウィジェットを破棄
+        for widget in self.winfo_children():
+            widget.destroy()
+        # ウィジェットを再作成
+        self.create_widgets()
+        self.log("UIのリロードが完了しました。")
 
     # --- UIの表示/非表示を切り替える関数 ---
     def on_mode_change(self):
