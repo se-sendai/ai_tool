@@ -965,17 +965,22 @@ def run_backend_process(mode, input_path=None, question=None, context=None, chat
         # --- テスト終了 ---
 
     if mode == AnalysisMode.INTERVIEW:
-        return process_interviews_logic(input_path)
+        message, saved_paths = process_interviews_logic(input_path)
+        return message, saved_paths, None
     elif mode == AnalysisMode.QA:
         logging.info("モード: AI対話 - 回答生成")
         # chat_sessionをask_question_to_aiに渡す
-        return ask_question_to_ai(question, chat_session, initial_context=context), [], []
+        message = ask_question_to_ai(question, chat_session, initial_context=context)
+        return message, [], None
     elif mode == AnalysisMode.DAILY_REPORT:
-        return process_daily_reports_logic(input_path)
+        message, saved_paths = process_daily_reports_logic(input_path)
+        return message, saved_paths, None
     elif mode == AnalysisMode.GET_DELETE_LIST:
-        return get_deletable_data_for_ui(), [], []
+        deletable_items = get_deletable_data_for_ui()
+        return deletable_items, [], None
     elif mode == AnalysisMode.EXECUTE_DELETE:
-        return handle_delete_request(input_path), [], []
+        message = handle_delete_request(input_path)
+        return message, [], None
     else:
         msg = f"無効なモードが指定されました: {mode}"
         logging.warning(msg)

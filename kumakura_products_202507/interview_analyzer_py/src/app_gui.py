@@ -307,7 +307,7 @@ class App(customtkinter.CTk):
     def run_backend(self, mode, path, question, context):
         try:
             self.log(f"バックエンド処理開始: モード={mode}, パス={path if path else 'N/A'}")
-            message, saved_paths = backend_logic.run_backend_process(mode, path, question, context)
+            message, saved_paths, _ = backend_logic.run_backend_process(mode, path, question, context)
             self.log(message)
             if saved_paths:
                 if mode == AnalysisMode.INTERVIEW:

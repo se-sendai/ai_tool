@@ -1,5 +1,6 @@
 import customtkinter
 from tkinterdnd2 import DND_FILES
+from constants import AnalysisMode
 
 class UiStateManager:
     """
@@ -97,8 +98,8 @@ class UiStateManager:
             self.is_path_entry_dnd_registered = False
             self.app.is_path_entry_dnd_registered = False # Appインスタンスのフラグも更新
 
-        # 実行ボタンのテキストとコマンドを変更
-        self.run_button.configure(text="AI対話開始", command=self.app.start_qa_session_flow)
+        # 実行ボタンのテキストとコマンドを変更し、活性化する
+        self.run_button.configure(text="AI対話開始", command=self.app.start_qa_session_flow, state="normal")
 
         # AI対話・削除関連UIを表示
         self.qa_chat_frame.grid(row=5, column=0, padx=20, pady=10, sticky="ew")
@@ -205,7 +206,7 @@ class UiStateManager:
         print("DEBUG: UiStateManager.set_idle_state called.")
         selected_mode = self.app.mode_variable.get() # Appインスタンスから現在のモードを取得
 
-        if selected_mode == self.app.AnalysisMode.QA:
+        if selected_mode == AnalysisMode.QA:
             # AI対話モードの場合、AI対話関連UIと削除関連UIを活性化
             if self.app.in_qa_session:
                 self.set_qa_active_state()
